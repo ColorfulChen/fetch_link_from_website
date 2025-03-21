@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import argparse
 
-result_links = set()
+input_url = ""
+result_file = ""
+result_link = set()
 
 def safe_soup(content):
     try:
@@ -38,7 +40,7 @@ def safe_request(url, headers, timeout=2):
         print(f"请求异常: {url} - {str(e)}")
     return None
 
-def get_all_links(url,depth):
+def get_all_links(url,depth,filePointer):
     if depth == 0:
         return []
     
@@ -91,13 +93,18 @@ def get_all_links(url,depth):
                         links.add(absolute_url)
 
     valid_schemes = ['http', 'https']
-    filtered_links = sorted([link for link in links if urlparse(link).scheme in valid_schemes])
+    invalid_file = ['.js','.css']
 
-    for link in filtered_links:
-        result_links.add(link)
-        get_all_links(link,depth-1)
+    for link in links:
+        if urlparse(link).scheme in valid_schemes:
+            if not any(ext in link for ext in invalid_file):
+                if(link not in result_link):
+                    result_link.add(link)
+                    filePointer.write(link)
+                    filePointer.write('\n')
+                    get_all_links(link,depth-1,filePointer)
 
-    return filtered_links
+    return []
 
 if __name__ == "__main__":
     #input_url = "https://www.bbc.com/zhongwen/simp"
@@ -108,10 +115,7 @@ if __name__ == "__main__":
     parser.add_argument('link')
     args = parser.parse_args()
     input_url = args.link
-    result_file = "result/" + input_url +".txt"
+    result_file = "result/" + "result" +".txt"
 
-    get_all_links(input_url,3)
     with open(result_file, "w+") as f:
-        for link in result_links:
-            f.write(link)
-            f.write('\n')
+         get_all_links(input_url,3,f)
