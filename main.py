@@ -53,7 +53,7 @@ def safe_request(url, headers, timeout=2):
         print(f"请求异常: {url} - {str(e)}")
     return None
 
-def get_all_links(url,depth = 1):
+def get_all_links(url,depth = 3):
     if depth == 0:
         return []
     
@@ -198,11 +198,13 @@ if __name__ == "__main__":
     result = open(result_path, "w+")
 
     get_all_links(input_url)
+    
     valid_link.close()
     invalid_link.close()
 
-    precision = download_all_content()
     validrate = len(valid_link_set) / (len(valid_link_set) + len(invalid_link_set))
-    result.write(f'precision:{precision}\n')
     result.write(f'validrate:{validrate}\n')
+
+    precision = download_all_content()
+    result.write(f'precision:{precision}\n')
     result.close()

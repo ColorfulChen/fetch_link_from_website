@@ -176,3 +176,5 @@ cython_debug/
 # result file
 result/
 log.txt
+#test.log
+run.sh
