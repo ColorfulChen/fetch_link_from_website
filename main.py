@@ -193,9 +193,9 @@ if __name__ == "__main__":
     except OSError as error:
         print(f"Error occurred while creating folder: {error}")
 
-    valid_link = open(valid_link_path, "w+")
-    invalid_link = open(invalid_link_path, "w+")
-    result = open(result_path, "w+")
+    valid_link = open(valid_link_path, "w+",encoding='utf-8')
+    invalid_link = open(invalid_link_path, "w+",encoding='utf-8')
+    result = open(result_path, "w+",encoding='utf-8')
 
     get_all_links(input_url)
     

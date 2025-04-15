@@ -178,3 +178,5 @@ result/
 log.txt
 #test.log
 run.sh
+res.csv
+test.ps1
