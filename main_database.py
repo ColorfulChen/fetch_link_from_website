@@ -8,7 +8,9 @@ import time
 from pymongo import MongoClient
 from datetime import datetime
 import chardet
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 input_url = ""
 result_dir = ""
@@ -25,7 +27,7 @@ valid_link_set = set()
 invalid_link_set = set()
 
 # MongoDB 配置
-MONGO_URI = "mongodb://localhost:27017/"  # 默认本地MongoDB
+MONGO_URI = os.environ.get("DATABASE_BASE_URL", "mongodb://localhost:27017/")
 DB_NAME = "data"
 COLLECTION_NAME = "web"
 
