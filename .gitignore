@@ -180,3 +180,6 @@ log.txt
 run.sh
 res.csv
 test.ps1
+
+.idea/*
+# Ignore all files in the .idea directory except for the following:
