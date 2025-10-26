@@ -1,0 +1,1 @@
+import{az as t}from"./index-BOVhXILd.js";const u=e=>t.request("post","/websites",{data:e}),i=e=>t.request("get","/websites",{params:e}),a=(e,s)=>t.request("put",`/websites/${e}`,{data:s}),b=e=>t.request("delete",`/websites/${e}`);export{u as c,b as d,i as g,a as u};
