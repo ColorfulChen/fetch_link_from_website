@@ -19,7 +19,7 @@ except Exception as e:
 if __name__ == '__main__':
     # 获取配置
     host = os.getenv('FLASK_HOST', '0.0.0.0')
-    port = int(os.getenv('FLASK_PORT', 5000))
+    port = int(os.getenv('FLASK_PORT', 9999))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
 
     print(f"启动 Flask 应用...")
