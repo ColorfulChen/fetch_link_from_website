@@ -13,9 +13,25 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { ElMessage } from "element-plus";
+
+// 根据状态码获取默认错误信息
+function getDefaultErrorMessage(status: number): string {
+  const errorMap: Record<number, string> = {
+    400: "请求参数错误",
+    404: "资源不存在",
+    409: "资源冲突",
+    500: "服务器内部错误",
+    502: "网关错误",
+    503: "服务暂时不可用",
+    504: "网关超时"
+  };
+  return errorMap[status] || `请求失败 (${status})`;
+}
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
+  baseURL: "/api",
   // 请求超时时间
   timeout: 10000,
   headers: {
@@ -139,6 +155,44 @@ class PureHttp {
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
+
+        // 处理 HTTP 错误
+        if (!$error.isCancelRequest) {
+          const { response } = error;
+          if (response) {
+            const { status, data } = response;
+            // 后端返回的错误信息
+            const message = data?.message || getDefaultErrorMessage(status);
+
+            // 根据状态码显示不同的错误提示
+            switch (status) {
+              case 400:
+                ElMessage.error(`参数错误: ${message}`);
+                break;
+              case 404:
+                ElMessage.error(`资源不存在: ${message}`);
+                break;
+              case 409:
+                ElMessage.error(`操作冲突: ${message}`);
+                break;
+              case 500:
+                ElMessage.error(`服务器错误: ${message}`);
+                break;
+              default:
+                ElMessage.error(message || "请求失败");
+            }
+          } else if (error.message) {
+            // 网络错误或超时
+            if (error.message.includes("timeout")) {
+              ElMessage.error("请求超时,请稍后重试");
+            } else if (error.message.includes("Network Error")) {
+              ElMessage.error("网络连接失败,请检查网络");
+            } else {
+              ElMessage.error(error.message);
+            }
+          }
+        }
+
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }

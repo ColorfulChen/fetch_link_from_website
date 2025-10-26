@@ -66,7 +66,8 @@ def export_data():
         if format_type == 'csv':
             with open(filepath, 'w', newline='', encoding='utf-8') as f:
                 if links:
-                    writer = csv.DictWriter(f, fieldnames=['url', 'domain', 'link_type', 'status_code', 'last_crawled_at'])
+                    writer = csv.DictWriter(
+                        f, fieldnames=['url', 'domain', 'link_type', 'status_code', 'last_crawled_at'])
                     writer.writeheader()
                     for link in links:
                         writer.writerow({
@@ -92,7 +93,8 @@ def export_data():
 
         # 获取文件大小
         file_size = os.path.getsize(filepath)
-        file_size_str = f"{file_size / 1024:.2f} KB" if file_size < 1024 * 1024 else f"{file_size / (1024 * 1024):.2f} MB"
+        file_size_str = f"{file_size / 1024:.2f} KB" if file_size < 1024 * \
+            1024 else f"{file_size / (1024 * 1024):.2f} MB"
 
         return success_response({
             'download_url': f'/api/export/download/{filename}',
@@ -111,7 +113,8 @@ def export_data():
 def download_file(filename):
     """下载导出文件"""
     try:
-        filepath = os.path.join('exports', filename)
+        filepath = os.path.join(os.getcwd(), 'exports', filename)
+        print(filepath)
         if not os.path.exists(filepath):
             return error_response('文件不存在', 404)
 

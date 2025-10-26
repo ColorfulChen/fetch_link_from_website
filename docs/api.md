@@ -451,7 +451,7 @@ GET /api/tasks?website_id=xxx&status=completed&page=1&page_size=20
 | 参数 | 类型 | 必填 | 默认值 | 描述 |
 |------|------|------|--------|------|
 | website_id | string | 否 | - | 网站 ID 过滤 |
-| status | string | 否 | - | 状态过滤（pending/running/completed/failed） |
+| status | string | 否 | - | 状态过滤（pending/running/completed/failed/cancelled） |
 | page | integer | 否 | 1 | 页码 |
 | page_size | integer | 否 | 20 | 每页大小 |
 
@@ -608,6 +608,93 @@ GET /api/tasks/{task_id}/logs?level=INFO&page=1&page_size=50
 **错误码**
 
 - `400`: 任务 ID 格式无效
+- `500`: 服务器内部错误
+
+---
+
+### 5. 取消运行中的任务
+
+强制取消正在运行的爬取任务。
+
+**请求**
+
+```http
+POST /api/tasks/{task_id}/cancel
+```
+
+**路径参数**
+
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| task_id | string | 是 | 任务 ID（ObjectId） |
+
+**响应**
+
+```json
+{
+  "success": true,
+  "message": "任务已强制取消",
+  "data": {
+    "task_id": "507f1f77bcf86cd799439012",
+    "status": "cancelled"
+  }
+}
+```
+
+**说明**
+
+- 只能取消状态为 `running` 的任务
+- 取消操作是强制的，任务状态会立即更新为 `cancelled`
+- 后台线程会在下一个检查点检测到取消信号并停止执行
+- 已经完成的数据保存操作不会回滚
+
+**错误码**
+
+- `400`: 任务 ID 格式无效或任务状态不允许取消
+- `404`: 任务不存在
+- `500`: 服务器内部错误
+
+---
+
+### 6. 删除任务
+
+删除指定的爬取任务及其相关日志。
+
+**请求**
+
+```http
+DELETE /api/tasks/{task_id}
+```
+
+**路径参数**
+
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| task_id | string | 是 | 任务 ID（ObjectId） |
+
+**响应**
+
+```json
+{
+  "success": true,
+  "message": "任务及相关数据已删除",
+  "data": {
+    "task_id": "507f1f77bcf86cd799439012"
+  }
+}
+```
+
+**说明**
+
+- 不能删除状态为 `running` 的任务，必须先取消任务
+- 删除任务会同时删除该任务的所有日志记录
+- 已爬取的链接数据不会被删除
+
+**错误码**
+
+- `400`: 任务 ID 格式无效
+- `404`: 任务不存在
+- `409`: 任务正在运行，无法删除
 - `500`: 服务器内部错误
 
 ---

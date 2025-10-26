@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(WEBSITE_ID=\"68fb2bf16c550f6817fdb9c7\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

@@ -49,7 +49,7 @@ class CrawlTaskModel:
         更新任务状态
 
         Args:
-            status: 任务状态 (pending/running/completed/failed)
+            status: 任务状态 (pending/running/completed/failed/cancelled)
             **kwargs: 其他要更新的字段
 
         Returns:
@@ -59,7 +59,7 @@ class CrawlTaskModel:
 
         if status == 'running':
             update_data['started_at'] = datetime.utcnow()
-        elif status in ['completed', 'failed']:
+        elif status in ['completed', 'failed', 'cancelled']:
             update_data['completed_at'] = datetime.utcnow()
 
         update_data.update(kwargs)

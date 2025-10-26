@@ -350,6 +350,9 @@ class CrawlerService:
             dict - 爬取结果统计
         """
         try:
+            # 清除之前的停止标志(如果存在)
+            app_global.clear_stop_flag(task_id)
+
             # 更新任务状态为 running
             self.db.crawl_tasks.update_one(
                 {'_id': task_id},
@@ -384,9 +387,27 @@ class CrawlerService:
             # 执行爬取
             results, valid_rate, precision_rate = crawler_link(url, depth, exclude_urls)
 
+            # 检查是否需要停止（任务可能已被强制取消）
+            if app_global.should_stop(task_id):
+                self._log(task_id, 'INFO', '检测到取消信号，停止执行')
+                app_global.clear_stop_flag(task_id)
+                return {
+                    'total_links': 0,
+                    'valid_links': 0,
+                    'invalid_links': 0,
+                    'new_links': 0,
+                    'valid_rate': 0,
+                    'precision_rate': 0
+                }
+
             # 保存爬取结果到数据库
             new_links = 0
             for result in results[:max_links]:  # 限制最大链接数
+                # 检查是否需要停止
+                if app_global.should_stop(task_id):
+                    self._log(task_id, 'INFO', '检测到取消信号，停止保存')
+                    break
+
                 link_url = result['link']
 
                 # 检查链接是否已存在
@@ -432,14 +453,20 @@ class CrawlerService:
                 )
             )
 
-            # 更新任务状态为 completed
-            self.db.crawl_tasks.update_one(
-                {'_id': task_id},
-                CrawlTaskModel.update_status('completed')
-            )
-
-            # 记录日志
-            self._log(task_id, 'INFO', f'爬取任务完成 - 总链接: {total_links}, 新增: {new_links}')
+            # 检查是否被取消（任务可能在保存过程中被取消）
+            if app_global.should_stop(task_id):
+                self._log(task_id, 'INFO', f'任务已取消 - 已处理: {new_links} 个链接')
+                app_global.clear_stop_flag(task_id)
+            else:
+                # 更新任务状态为 completed
+                self.db.crawl_tasks.update_one(
+                    {'_id': task_id},
+                    CrawlTaskModel.update_status('completed')
+                )
+                # 记录日志
+                self._log(task_id, 'INFO', f'爬取任务完成 - 总链接: {total_links}, 新增: {new_links}')
+                # 清除停止标志
+                app_global.clear_stop_flag(task_id)
 
             return {
                 'total_links': total_links,
@@ -459,6 +486,9 @@ class CrawlerService:
 
             # 记录错误日志
             self._log(task_id, 'ERROR', f'爬取任务失败: {str(e)}')
+
+            # 清除停止标志
+            app_global.clear_stop_flag(task_id)
 
             raise
 

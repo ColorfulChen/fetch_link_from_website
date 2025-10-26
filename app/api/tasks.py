@@ -175,3 +175,69 @@ def get_task_logs(task_id):
         return error_response('任务ID格式无效', 400)
     except Exception as e:
         return error_response(f'获取任务日志失败: {str(e)}', 500)
+
+
+@tasks_bp.route('/<task_id>/cancel', methods=['POST'])
+def cancel_task(task_id):
+    """强制取消运行中的任务"""
+    try:
+        db = get_db()
+        task = db.crawl_tasks.find_one({'_id': ObjectId(task_id)})
+
+        if not task:
+            return error_response('任务不存在', 404)
+
+        # 只能取消运行中的任务
+        if task['status'] != 'running':
+            return error_response(f'只能取消运行中的任务，当前状态: {task["status"]}', 400)
+
+        # 设置停止标志（通知后台任务停止）
+        from ..global_vars import set_stop_flag
+        set_stop_flag(task_id)
+
+        # 立即将任务状态改为 cancelled（强制取消）
+        db.crawl_tasks.update_one(
+            {'_id': ObjectId(task_id)},
+            CrawlTaskModel.update_status('cancelled')
+        )
+
+        return success_response(
+            {'task_id': task_id, 'status': 'cancelled'},
+            '任务已强制取消'
+        )
+
+    except InvalidId:
+        return error_response('任务ID格式无效', 400)
+    except Exception as e:
+        return error_response(f'取消任务失败: {str(e)}', 500)
+
+
+@tasks_bp.route('/<task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    """删除任务及相关数据"""
+    try:
+        db = get_db()
+        task = db.crawl_tasks.find_one({'_id': ObjectId(task_id)})
+
+        if not task:
+            return error_response('任务不存在', 404)
+
+        # 不允许删除运行中的任务
+        if task['status'] == 'running':
+            return error_response('不能删除运行中的任务，请先取消任务', 409)
+
+        # 删除任务相关的日志
+        db.crawl_logs.delete_many({'task_id': ObjectId(task_id)})
+
+        # 删除任务
+        db.crawl_tasks.delete_one({'_id': ObjectId(task_id)})
+
+        return success_response(
+            {'task_id': task_id},
+            '任务及相关数据已删除'
+        )
+
+    except InvalidId:
+        return error_response('任务ID格式无效', 400)
+    except Exception as e:
+        return error_response(f'删除任务失败: {str(e)}', 500)
