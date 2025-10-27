@@ -35,8 +35,22 @@ export type RefreshTokenResult = {
 };
 
 /** 登录 */
-export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/login", { data });
+export const getLogin = async (data?: object) => {
+  return {
+    success: true,
+    data: {
+      avatar: "https://avatars.githubusercontent.com/u/44761321",
+      username: "admin",
+      nickname: "小铭",
+      // 一个用户可能有多个角色
+      roles: ["admin"],
+      // 按钮级别权限
+      permissions: ["*:*:*"],
+      accessToken: "eyJhbGciOiJIUzUxMiJ9.admin",
+      refreshToken: "eyJhbGciOiJIUzUxMiJ9.adminRefresh",
+      expires: "2030/10/30 00:00:00"
+    }
+  };
 };
 
 /** 刷新`token` */
