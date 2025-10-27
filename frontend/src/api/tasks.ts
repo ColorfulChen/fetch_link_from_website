@@ -21,6 +21,7 @@ export type CrawlTask = {
   started_at: string | null;
   completed_at: string | null;
   statistics: TaskStatistics;
+  screenshot_path: string | null;
   error_message: string | null;
 };
 

@@ -10,6 +10,7 @@ import {
   type CreateWebsiteParams,
   type UpdateWebsiteParams
 } from "@/api/websites";
+import { formatTime } from "@/utils/time";
 
 defineOptions({
   name: "WebsiteManage"
@@ -216,7 +217,7 @@ onMounted(() => {
         <el-table-column prop="max_links" label="最大链接数" width="120" />
         <el-table-column prop="created_at" label="创建时间" width="180">
           <template #default="{ row }">
-            {{ new Date(row.created_at).toLocaleString() }}
+            {{ formatTime(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">

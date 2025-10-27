@@ -121,7 +121,9 @@ onMounted(() => {
     <!-- 欢迎标题 -->
     <el-card class="mb-4">
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">欢迎使用 FETCHLINK</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          欢迎使用 FETCHLINK
+        </h1>
         <p class="text-gray-500">网页链接爬虫系统</p>
       </div>
     </el-card>
@@ -174,10 +176,12 @@ onMounted(() => {
     </el-card>
 
     <!-- 统计概览 -->
-    <el-card v-loading="loading" v-if="statistics">
+    <el-card v-if="statistics" v-loading="loading">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="text-base font-semibold">统计概览 - {{ statistics.website.name }}</span>
+          <span class="text-base font-semibold"
+            >统计概览 - {{ statistics.website.name }}</span
+          >
           <el-text type="info" size="small">
             统计周期: {{ statistics.period.from }} ~ {{ statistics.period.to }}
           </el-text>
@@ -214,11 +218,12 @@ onMounted(() => {
           <el-col :span="6">
             <div class="text-center">
               <div class="text-gray-500 text-sm mb-2">任务成功率</div>
-              <div class="text-2xl font-semibold" style="color: #67C23A">
+              <div class="text-2xl font-semibold" style="color: #67c23a">
                 {{
                   statistics.summary.total_tasks > 0
                     ? formatPercent(
-                        statistics.summary.completed_tasks / statistics.summary.total_tasks
+                        statistics.summary.completed_tasks /
+                          statistics.summary.total_tasks
                       )
                     : "0%"
                 }}
@@ -251,7 +256,7 @@ onMounted(() => {
           <el-col :span="8">
             <div class="text-center">
               <div class="text-gray-500 text-sm mb-2">平均新增率</div>
-              <div class="text-2xl font-semibold" style="color: #E6A23C">
+              <div class="text-2xl font-semibold" style="color: #e6a23c">
                 {{
                   statistics.summary.total_links_crawled > 0
                     ? formatPercent(
@@ -276,7 +281,7 @@ onMounted(() => {
             <el-card shadow="never" class="text-center">
               <div class="mb-4">
                 <div class="text-gray-500 text-sm mb-2">平均有效率</div>
-                <div class="text-4xl font-semibold" style="color: #67C23A">
+                <div class="text-4xl font-semibold" style="color: #67c23a">
                   {{ formatPercent(statistics.summary.avg_valid_rate) }}
                 </div>
               </div>
@@ -294,7 +299,7 @@ onMounted(() => {
             <el-card shadow="never" class="text-center">
               <div class="mb-4">
                 <div class="text-gray-500 text-sm mb-2">平均精准率</div>
-                <div class="text-4xl font-semibold" style="color: #409EFF">
+                <div class="text-4xl font-semibold" style="color: #409eff">
                   {{ formatPercent(statistics.summary.avg_precision_rate) }}
                 </div>
               </div>

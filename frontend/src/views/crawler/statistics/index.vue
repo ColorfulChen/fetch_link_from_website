@@ -166,10 +166,12 @@ onMounted(() => {
     </el-card>
 
     <!-- 统计概览 -->
-    <el-card v-loading="loading" v-if="statistics">
+    <el-card v-if="statistics" v-loading="loading">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="text-base font-semibold">统计概览 - {{ statistics.website.name }}</span>
+          <span class="text-base font-semibold"
+            >统计概览 - {{ statistics.website.name }}</span
+          >
           <el-text type="info" size="small">
             统计周期: {{ statistics.period.from }} ~ {{ statistics.period.to }}
           </el-text>
@@ -209,7 +211,8 @@ onMounted(() => {
               :value="
                 statistics.summary.total_tasks > 0
                   ? formatPercent(
-                      statistics.summary.completed_tasks / statistics.summary.total_tasks
+                      statistics.summary.completed_tasks /
+                        statistics.summary.total_tasks
                     )
                   : '0%'
               "

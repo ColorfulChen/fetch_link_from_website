@@ -2,7 +2,14 @@
 import { ref, onMounted, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { getTaskDetail, getTaskLogs, type CrawlTask, type TaskLog } from "@/api/tasks";
+import { Picture as IconPicture } from "@element-plus/icons-vue";
+import {
+  getTaskDetail,
+  getTaskLogs,
+  type CrawlTask,
+  type TaskLog
+} from "@/api/tasks";
+import { formatTime } from "@/utils/time";
 
 defineOptions({
   name: "TaskDetail"
@@ -21,7 +28,11 @@ const logs = ref<TaskLog[]>([]);
 const logsTotal = ref(0);
 
 // 日志查询参数
-const logsQuery = reactive({
+const logsQuery = reactive<{
+  level: "" | "INFO" | "WARNING" | "ERROR";
+  page: number;
+  page_size: number;
+}>({
   level: "",
   page: 1,
   page_size: 50
@@ -54,12 +65,6 @@ const getLogLevelType = (level: string) => {
 // 格式化百分比
 const formatPercent = (value: number) => {
   return `${(value * 100).toFixed(2)}%`;
-};
-
-// 格式化时间
-const formatTime = (time: string | null) => {
-  if (!time) return "-";
-  return new Date(time).toLocaleString();
 };
 
 // 加载任务详情
@@ -129,20 +134,32 @@ onMounted(() => {
       <template #header>
         <div class="flex items-center justify-between">
           <span class="text-base font-semibold">基本信息</span>
-          <el-tag v-if="taskDetail" :type="getStatusType(taskDetail.status)" size="large">
+          <el-tag
+            v-if="taskDetail"
+            :type="getStatusType(taskDetail.status)"
+            size="large"
+          >
             {{ taskDetail.status }}
           </el-tag>
         </div>
       </template>
 
       <el-descriptions v-if="taskDetail" :column="2" border>
-        <el-descriptions-item label="任务ID">{{ taskDetail.id }}</el-descriptions-item>
-        <el-descriptions-item label="网站ID">{{ taskDetail.website_id }}</el-descriptions-item>
+        <el-descriptions-item label="任务ID">{{
+          taskDetail.id
+        }}</el-descriptions-item>
+        <el-descriptions-item label="网站ID">{{
+          taskDetail.website_id
+        }}</el-descriptions-item>
         <el-descriptions-item label="任务类型">
           {{ taskDetail.task_type === "manual" ? "手动" : "定时" }}
         </el-descriptions-item>
         <el-descriptions-item label="爬取策略">
-          <el-tag :type="taskDetail.strategy === 'incremental' ? 'success' : 'warning'">
+          <el-tag
+            :type="
+              taskDetail.strategy === 'incremental' ? 'success' : 'warning'
+            "
+          >
             {{ taskDetail.strategy === "incremental" ? "增量" : "全量" }}
           </el-tag>
         </el-descriptions-item>
@@ -152,7 +169,11 @@ onMounted(() => {
         <el-descriptions-item label="完成时间">
           {{ formatTime(taskDetail.completed_at) }}
         </el-descriptions-item>
-        <el-descriptions-item v-if="taskDetail.error_message" label="错误信息" :span="2">
+        <el-descriptions-item
+          v-if="taskDetail.error_message"
+          label="错误信息"
+          :span="2"
+        >
           <el-text type="danger">{{ taskDetail.error_message }}</el-text>
         </el-descriptions-item>
       </el-descriptions>
@@ -166,7 +187,10 @@ onMounted(() => {
 
       <el-row :gutter="20">
         <el-col :span="6">
-          <el-statistic title="总链接数" :value="taskDetail.statistics.total_links" />
+          <el-statistic
+            title="总链接数"
+            :value="taskDetail.statistics.total_links"
+          />
         </el-col>
         <el-col :span="6">
           <el-statistic
@@ -197,16 +221,44 @@ onMounted(() => {
         <el-col :span="12">
           <el-statistic
             title="有效率"
-            :value="formatPercent(taskDetail.statistics.valid_rate)"
+            :value="taskDetail.statistics.valid_rate * 100"
+            :precision="2"
+            suffix="%"
           />
         </el-col>
         <el-col :span="12">
           <el-statistic
             title="精准率"
-            :value="formatPercent(taskDetail.statistics.precision_rate)"
+            :value="taskDetail.statistics.precision_rate * 100"
+            :precision="2"
+            suffix="%"
           />
         </el-col>
       </el-row>
+    </el-card>
+
+    <!-- 网站截图 -->
+    <el-card v-if="taskDetail && taskDetail.screenshot_path" class="mt-4">
+      <template #header>
+        <span class="text-base font-semibold">网站截图</span>
+      </template>
+
+      <div class="screenshot-container">
+        <el-image
+          :src="`/api/screenshots/${taskDetail.screenshot_path}`"
+          :preview-src-list="[`/api/screenshots/${taskDetail.screenshot_path}`]"
+          fit="contain"
+          style="max-width: 100%; max-height: 600px"
+          lazy
+        >
+          <template #error>
+            <div class="image-slot">
+              <el-icon><icon-picture /></el-icon>
+              <span>截图加载失败</span>
+            </div>
+          </template>
+        </el-image>
+      </div>
     </el-card>
 
     <!-- 任务日志 -->
@@ -228,7 +280,7 @@ onMounted(() => {
         </div>
       </template>
 
-      <el-table :data="logs" v-loading="logsLoading" stripe max-height="500">
+      <el-table v-loading="logsLoading" :data="logs" stripe max-height="500">
         <el-table-column prop="level" label="级别" width="100">
           <template #default="{ row }">
             <el-tag :type="getLogLevelType(row.level)" size="small">
@@ -236,7 +288,12 @@ onMounted(() => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="message" label="消息" min-width="400" show-overflow-tooltip />
+        <el-table-column
+          prop="message"
+          label="消息"
+          min-width="400"
+          show-overflow-tooltip
+        />
         <el-table-column prop="created_at" label="时间" width="180">
           <template #default="{ row }">
             {{ formatTime(row.created_at) }}
@@ -261,5 +318,28 @@ onMounted(() => {
 <style scoped lang="scss">
 .task-detail {
   padding: 20px;
+}
+
+.screenshot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .image-slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 200px;
+    background: var(--el-fill-color-light);
+    color: var(--el-text-color-secondary);
+    font-size: 14px;
+
+    .el-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+  }
 }
 </style>

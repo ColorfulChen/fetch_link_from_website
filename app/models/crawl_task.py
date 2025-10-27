@@ -40,6 +40,7 @@ class CrawlTaskModel:
                 'valid_rate': 0.0,
                 'precision_rate': 0.0
             },
+            'screenshot_path': None,
             'error_message': None
         }
 

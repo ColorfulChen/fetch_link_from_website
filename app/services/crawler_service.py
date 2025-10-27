@@ -9,6 +9,7 @@ import re
 import os
 import uuid
 import chardet
+import socket
 from datetime import datetime
 from bson import ObjectId
 
@@ -106,6 +107,28 @@ def safe_request(url, headers, timeout=2):
     return None
 
 
+def get_ip_address(domain):
+    """
+    获取域名的IPv4地址
+
+    参数:
+        domain: str - 域名
+
+    返回:
+        str - IPv4地址，失败返回 None
+    """
+    try:
+        # 使用 socket.gethostbyname 获取IPv4地址
+        ip_address = socket.gethostbyname(domain)
+        return ip_address
+    except socket.gaierror as e:
+        print(f"获取IP地址失败 {domain}: {e}")
+        return None
+    except Exception as e:
+        print(f"获取IP地址异常 {domain}: {e}")
+        return None
+
+
 def screenshot_page(url, save_dir):
     """
     对指定 URL 截图并保存到指定目录
@@ -115,7 +138,7 @@ def screenshot_page(url, save_dir):
         save_dir: str - 截图保存目录
 
     返回:
-        save_path: str - 截图文件路径，失败返回 None
+        save_path: str - 截图文件相对路径（相对于项目根目录），失败返回 None
     """
     driver = None
     try:
@@ -153,7 +176,11 @@ def screenshot_page(url, save_dir):
         # 保存截图
         driver.save_screenshot(save_path)
         print(f"网页截图已保存: {save_path}")
-        return save_path
+
+        # 返回相对于项目根目录的相对路径
+        project_root = os.getcwd()
+        relative_path = os.path.relpath(save_path, project_root)
+        return relative_path
 
     except Exception as e:
         print(f"截图失败 {url}: {e}")
@@ -301,10 +328,11 @@ def crawler_link(url, depth=3, exclude=None):
         exclude: list[str] - 需要排除的 url (用于增量更新策略)
 
     返回:
-        tuple: (results, valid_rate, precision_rate)
+        tuple: (results, valid_rate, precision_rate, screenshot_path)
         - results: list[dict] - [{'link': str, 'content_path': str}, ...]
         - valid_rate: float - 有效率
         - precision_rate: float - 精准率
+        - screenshot_path: str - 截图路径
     """
     # 获取所有链接
     print(f"开始爬取: {url}, 深度: {depth}")
@@ -317,8 +345,9 @@ def crawler_link(url, depth=3, exclude=None):
     print(f"保存目录: {save_dir}")
 
     # 对入口页面进行截图
+    screenshot_path = None
     try:
-        screenshot_page(url, save_dir)
+        screenshot_path = screenshot_page(url, save_dir)
     except Exception as e:
         print(f"入口页面截图失败 {url}: {e}")
 
@@ -345,6 +374,10 @@ def crawler_link(url, depth=3, exclude=None):
     for link in unique_links:
         print(f"处理链接: {link}")
 
+        # 获取链接的域名和IP地址
+        link_domain = urlparse(link).netloc
+        ip_address = get_ip_address(link_domain)
+
         # 尝试请求链接验证有效性
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -370,7 +403,8 @@ def crawler_link(url, depth=3, exclude=None):
                     'link': link,
                     'content_path': save_path,
                     'status_code': response.status_code,
-                    'content_type': response.headers.get('Content-Type', '')
+                    'content_type': response.headers.get('Content-Type', ''),
+                    'ip_address': ip_address
                 })
             except Exception as e:
                 print(f"下载失败: {link} - {str(e)}")
@@ -379,7 +413,8 @@ def crawler_link(url, depth=3, exclude=None):
                     'link': link,
                     'content_path': None,
                     'status_code': response.status_code,
-                    'content_type': response.headers.get('Content-Type', '')
+                    'content_type': response.headers.get('Content-Type', ''),
+                    'ip_address': ip_address
                 })
         else:
             invalid_links.append(link)
@@ -395,7 +430,7 @@ def crawler_link(url, depth=3, exclude=None):
     print(f"Valid Rate: {valid_rate:.2%}")
     print(f"Precision Rate: {precision_rate:.2%}")
 
-    return results, valid_rate, precision_rate
+    return results, valid_rate, precision_rate, screenshot_path
 
 
 class CrawlerService:
@@ -456,7 +491,7 @@ class CrawlerService:
                 self._log(task_id, 'INFO', '全量模式：爬取所有链接')
 
             # 执行爬取
-            results, valid_rate, precision_rate = crawler_link(url, depth, exclude_urls)
+            results, valid_rate, precision_rate, screenshot_path = crawler_link(url, depth, exclude_urls)
 
             # 检查是否需要停止（任务可能已被强制取消）
             if app_global.should_stop(task_id):
@@ -503,7 +538,8 @@ class CrawlerService:
                         link_type='valid' if result.get('content_path') else 'invalid',
                         status_code=result.get('status_code'),
                         content_type=result.get('content_type'),
-                        source_url=url
+                        source_url=url,
+                        ip_address=result.get('ip_address')
                     )
                     self.db.crawled_links.insert_one(link_doc)
                     new_links += 1
@@ -513,15 +549,20 @@ class CrawlerService:
             valid_links = len([r for r in results if r.get('content_path')])
             invalid_links = total_links - valid_links
 
-            # 更新任务统计
+            # 更新任务统计和截图路径
+            update_data = CrawlTaskModel.update_statistics(
+                total_links=total_links,
+                valid_links=valid_links,
+                invalid_links=invalid_links,
+                new_links=new_links
+            )
+            # 添加截图路径
+            if screenshot_path:
+                update_data['$set']['screenshot_path'] = screenshot_path
+
             self.db.crawl_tasks.update_one(
                 {'_id': task_id},
-                CrawlTaskModel.update_statistics(
-                    total_links=total_links,
-                    valid_links=valid_links,
-                    invalid_links=invalid_links,
-                    new_links=new_links
-                )
+                update_data
             )
 
             # 检查是否被取消（任务可能在保存过程中被取消）

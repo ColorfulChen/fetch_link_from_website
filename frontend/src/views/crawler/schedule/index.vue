@@ -10,6 +10,7 @@ import {
   type CreateScheduleParams
 } from "@/api/schedules";
 import { getWebsites, type Website } from "@/api/websites";
+import { formatTime } from "@/utils/time";
 
 defineOptions({
   name: "ScheduleManage"
@@ -43,11 +44,14 @@ const form = reactive<CreateScheduleParams>({
 const rules = computed(() => ({
   website_id: [{ required: true, message: "请选择网站", trigger: "change" }],
   name: [{ required: true, message: "请输入任务名称", trigger: "blur" }],
-  schedule_type: [{ required: true, message: "请选择调度类型", trigger: "change" }],
+  schedule_type: [
+    { required: true, message: "请选择调度类型", trigger: "change" }
+  ],
   strategy: [{ required: true, message: "请选择爬取策略", trigger: "change" }],
   hour: [
     {
-      required: form.schedule_type === "daily" || form.schedule_type === "monthly",
+      required:
+        form.schedule_type === "daily" || form.schedule_type === "monthly",
       message: "请输入小时",
       trigger: "blur"
     }
@@ -69,12 +73,6 @@ const getScheduleTypeText = (type: string) => {
     monthly: "每月"
   };
   return map[type] || type;
-};
-
-// 格式化时间
-const formatTime = (time: string | null) => {
-  if (!time) return "-";
-  return new Date(time).toLocaleString();
 };
 
 // 加载网站列表
@@ -212,17 +210,24 @@ onMounted(() => {
 
     <!-- 数据表格 -->
     <el-card>
-      <el-table :data="tableData" v-loading="loading" stripe>
+      <el-table v-loading="loading" :data="tableData" stripe>
         <el-table-column prop="name" label="任务名称" min-width="150" />
         <el-table-column prop="schedule_type" label="调度类型" width="100">
           <template #default="{ row }">
             {{ getScheduleTypeText(row.schedule_type) }}
           </template>
         </el-table-column>
-        <el-table-column prop="cron_expression" label="Cron表达式" width="150" />
+        <el-table-column
+          prop="cron_expression"
+          label="Cron表达式"
+          width="150"
+        />
         <el-table-column prop="strategy" label="爬取策略" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.strategy === 'incremental' ? 'success' : 'warning'" size="small">
+            <el-tag
+              :type="row.strategy === 'incremental' ? 'success' : 'warning'"
+              size="small"
+            >
               {{ row.strategy === "incremental" ? "增量" : "全量" }}
             </el-tag>
           </template>
@@ -268,14 +273,13 @@ onMounted(() => {
       width="600px"
       :close-on-click-modal="false"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="120px"
-      >
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="选择网站" prop="website_id">
-          <el-select v-model="form.website_id" placeholder="请选择网站" style="width: 100%">
+          <el-select
+            v-model="form.website_id"
+            placeholder="请选择网站"
+            style="width: 100%"
+          >
             <el-option
               v-for="website in websiteList"
               :key="website.id"
@@ -295,7 +299,9 @@ onMounted(() => {
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          v-if="form.schedule_type === 'daily' || form.schedule_type === 'monthly'"
+          v-if="
+            form.schedule_type === 'daily' || form.schedule_type === 'monthly'
+          "
           label="小时"
           prop="hour"
         >
@@ -307,7 +313,11 @@ onMounted(() => {
           />
           <span class="ml-2 text-gray-500">点</span>
         </el-form-item>
-        <el-form-item v-if="form.schedule_type === 'monthly'" label="日期" prop="day">
+        <el-form-item
+          v-if="form.schedule_type === 'monthly'"
+          label="日期"
+          prop="day"
+        >
           <el-input-number
             v-model="form.day"
             :min="1"

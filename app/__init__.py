@@ -43,7 +43,8 @@ def create_app():
         tasks_bp,
         schedules_bp,
         export_bp,
-        statistics_bp
+        statistics_bp,
+        screenshots_bp
     )
 
     app.register_blueprint(websites_bp)
@@ -51,6 +52,7 @@ def create_app():
     app.register_blueprint(schedules_bp)
     app.register_blueprint(export_bp)
     app.register_blueprint(statistics_bp)
+    app.register_blueprint(screenshots_bp)
 
     # 健康检查接口
     @app.route('/api/health', methods=['GET'])
@@ -86,7 +88,8 @@ def create_app():
                 'tasks': '/api/tasks',
                 'schedules': '/api/schedules',
                 'export': '/api/export',
-                'statistics': '/api/statistics'
+                'statistics': '/api/statistics',
+                'screenshots': '/api/screenshots'
             }
         }), 200
 

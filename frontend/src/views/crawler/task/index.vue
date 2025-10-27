@@ -11,6 +11,7 @@ import {
   type CreateCrawlTaskParams
 } from "@/api/tasks";
 import { getWebsites, type Website } from "@/api/websites";
+import { formatTime } from "@/utils/time";
 
 defineOptions({
   name: "TaskManage"
@@ -145,12 +146,6 @@ const formatPercent = (value: number) => {
   return `${(value * 100).toFixed(2)}%`;
 };
 
-// 格式化时间
-const formatTime = (time: string | null) => {
-  if (!time) return "-";
-  return new Date(time).toLocaleString();
-};
-
 // 分页改变
 const handlePageChange = (page: number) => {
   queryForm.page = page;
@@ -269,8 +264,13 @@ onMounted(() => {
 
     <!-- 数据表格 -->
     <el-card>
-      <el-table :data="tableData" v-loading="loading" stripe>
-        <el-table-column prop="id" label="任务ID" width="220" show-overflow-tooltip />
+      <el-table v-loading="loading" :data="tableData" stripe>
+        <el-table-column
+          prop="id"
+          label="任务ID"
+          width="220"
+          show-overflow-tooltip
+        />
         <el-table-column prop="task_type" label="类型" width="80">
           <template #default="{ row }">
             {{ row.task_type === "manual" ? "手动" : "定时" }}
@@ -278,7 +278,10 @@ onMounted(() => {
         </el-table-column>
         <el-table-column prop="strategy" label="策略" width="80">
           <template #default="{ row }">
-            <el-tag :type="row.strategy === 'incremental' ? 'success' : 'warning'" size="small">
+            <el-tag
+              :type="row.strategy === 'incremental' ? 'success' : 'warning'"
+              size="small"
+            >
               {{ getStrategyText(row.strategy) }}
             </el-tag>
           </template>
@@ -311,7 +314,11 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleViewDetail(row)">
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleViewDetail(row)"
+            >
               查看详情
             </el-button>
             <el-button
@@ -353,14 +360,13 @@ onMounted(() => {
       width="600px"
       :close-on-click-modal="false"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="120px"
-      >
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="选择网站" prop="website_id">
-          <el-select v-model="form.website_id" placeholder="请选择网站" style="width: 100%">
+          <el-select
+            v-model="form.website_id"
+            placeholder="请选择网站"
+            style="width: 100%"
+          >
             <el-option
               v-for="website in websiteList"
               :key="website.id"
