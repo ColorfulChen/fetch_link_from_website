@@ -19,45 +19,68 @@ from app.models import CrawledLinkModel, CrawlTaskModel, CrawlLogModel
 
 
 def safe_soup(content, content_type=None):
-    """安全的HTML/XML解析，支持智能检测"""
-    try:
-        is_xml = False
-        # 通过 content_type 检测 XML
-        if content_type:
-            ct = content_type.lower()
-            if 'xml' in ct or 'xhtml' in ct:
-                is_xml = True
-        else:
-            # 通过内容头部检测 XML
-            head = content[:200].lstrip() if isinstance(content, (bytes, bytearray)) else str(content)[:200].lstrip()
-            try:
-                if isinstance(head, (bytes, bytearray)):
-                    h = head.lower()
-                    if h.startswith(b'<?xml') or b'<rss' in h or b'<feed' in h:
-                        is_xml = True
-                else:
-                    h = head.lower()
-                    if h.startswith('<?xml') or '<rss' in h or '<feed' in h:
-                        is_xml = True
-            except:
-                pass
+    """安全的HTML/XML解析，支持智能检测和编码处理"""
+    import io
+    from contextlib import redirect_stderr
 
-        # 使用对应的解析器
-        if is_xml:
-            return BeautifulSoup(content, 'xml')
-        return BeautifulSoup(content, 'lxml')
-    except:
+    # 先将 bytes 转换为字符串，避免 lxml 的编码错误
+    if isinstance(content, (bytes, bytearray)):
+        try:
+            # 使用 chardet 检测编码
+            detected = chardet.detect(content)
+            encoding = detected.get('encoding', 'utf-8')
+            confidence = detected.get('confidence', 0)
+
+            # 如果检测置信度太低，使用常见编码尝试
+            if confidence < 0.7:
+                for enc in ['utf-8', 'gbk', 'gb2312', 'gb18030', 'latin1']:
+                    try:
+                        content = content.decode(enc, errors='ignore')
+                        break
+                    except:
+                        continue
+                else:
+                    # 所有编码都失败，使用 replace 模式
+                    content = content.decode('utf-8', errors='replace')
+            else:
+                content = content.decode(encoding or 'utf-8', errors='ignore')
+        except Exception:
+            # 解码失败，使用 replace 模式
+            content = content.decode('utf-8', errors='replace')
+
+    # 检测是否是 XML
+    is_xml = False
+    if content_type:
+        ct = content_type.lower()
+        if 'xml' in ct or 'xhtml' in ct:
+            is_xml = True
+
+    if not is_xml:
+        # 通过内容头部检测 XML
+        head = content[:200].lstrip() if isinstance(content, str) else ''
+        h = head.lower()
+        if h.startswith('<?xml') or '<rss' in h or '<feed' in h:
+            is_xml = True
+
+    # 抑制 lxml 的编码警告信息
+    stderr_buffer = io.StringIO()
+
+    try:
+        # 使用对应的解析器，抑制错误输出
+        with redirect_stderr(stderr_buffer):
+            if is_xml:
+                # XML 使用 xml 解析器
+                return BeautifulSoup(content, 'xml', from_encoding='utf-8')
+            else:
+                # HTML 使用 lxml 解析器
+                return BeautifulSoup(content, 'lxml', from_encoding='utf-8')
+    except Exception:
+        # lxml 失败，尝试 html.parser（更宽容）
         try:
             return BeautifulSoup(content, 'html.parser')
-        except:
-            try:
-                encoding = chardet.detect(content)['encoding']
-                decoded = content.decode(encoding or 'utf-8', errors='replace')
-                if content_type and ('xml' in content_type.lower() or 'xhtml' in content_type.lower()):
-                    return BeautifulSoup(decoded, 'xml')
-                return BeautifulSoup(decoded, 'html.parser')
-            except:
-                return None
+        except Exception:
+            # 所有解析器都失败
+            return None
 
 
 def safe_request(url, headers, timeout=2):
@@ -94,25 +117,55 @@ def screenshot_page(url, save_dir):
     返回:
         save_path: str - 截图文件路径，失败返回 None
     """
+    driver = None
     try:
-        drv = app_global.get_driver()
-        if not drv:
-            return None
-        drv.get(url)
+        # 为每次截图创建独立的驱动实例
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+
+        opts = Options()
+        opts.add_argument('--headless=new')
+        opts.add_argument('--disable-gpu')
+        opts.add_argument('--no-sandbox')
+        opts.add_argument('--disable-dev-shm-usage')  # 解决共享内存不足问题
+        opts.add_argument('--disable-software-rasterizer')
+        opts.add_argument('--window-size=1280,1024')
+        opts.add_argument('--disable-extensions')
+        opts.add_argument('--disable-logging')
+        opts.add_argument('--log-level=3')  # 只显示严重错误
+
+        driver = webdriver.Chrome(options=opts)
+        driver.set_page_load_timeout(10)
+        driver.set_script_timeout(10)
+
+        # 访问页面
+        driver.get(url)
+
+        # 等待页面加载
         import time
-        time.sleep(1)  # 简单等待，避免空白截图
+        time.sleep(2)  # 增加等待时间，确保页面渲染完成
 
         # 生成安全的文件名
         illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
         fname = "screenshot-" + re.sub(illegal_chars, '', url) + ".png"
         save_path = os.path.join(save_dir, fname)
 
-        drv.save_screenshot(save_path)
+        # 保存截图
+        driver.save_screenshot(save_path)
         print(f"网页截图已保存: {save_path}")
         return save_path
+
     except Exception as e:
         print(f"截图失败 {url}: {e}")
         return None
+
+    finally:
+        # 确保驱动被正确关闭
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
 
 
 def get_all_links(url, depth=3, exclude=None, visited=None):
@@ -152,6 +205,25 @@ def get_all_links(url, depth=3, exclude=None, visited=None):
     if not response:
         print(f"{url} 无响应")
         return []
+
+    # 检查内容类型，跳过二进制文件
+    content_type = response.headers.get('Content-Type', '').lower()
+    binary_types = [
+        'image/', 'video/', 'audio/', 'application/pdf',
+        'application/zip', 'application/x-rar', 'application/octet-stream',
+        'font/', 'application/x-font', 'application/vnd.ms-fontobject'
+    ]
+    if any(bt in content_type for bt in binary_types):
+        print(f"跳过二进制文件: {url} (Content-Type: {content_type})")
+        return []
+
+    # 只解析 HTML/XML 类型的内容
+    parseable_types = ['text/html', 'application/xhtml', 'text/xml', 'application/xml', 'application/rss', 'application/atom']
+    if content_type and not any(pt in content_type for pt in parseable_types):
+        # 如果有明确的 Content-Type 但不是可解析类型，跳过
+        if 'text/' not in content_type and 'application/' in content_type:
+            print(f"跳过不可解析的内容: {url} (Content-Type: {content_type})")
+            return []
 
     base_url = response.url
     soup = safe_soup(response.content, response.headers.get('Content-Type', ''))
@@ -368,7 +440,6 @@ class CrawlerService:
                 raise Exception(f"网站不存在: {website_id}")
 
             url = website['url']
-            domain = website['domain']
 
             # 根据策略准备 exclude 列表
             exclude_urls = []
