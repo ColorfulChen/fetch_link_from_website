@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { Upload, UploadFilled } from "@element-plus/icons-vue";
 import {
   getWebsites,
   createWebsite,
   updateWebsite,
   deleteWebsite,
+  batchImportWebsites,
   type Website,
   type CreateWebsiteParams,
   type UpdateWebsiteParams
@@ -165,6 +167,79 @@ const handleReset = () => {
   loadWebsites();
 };
 
+// 批量导入
+const importDialogVisible = ref(false);
+const uploadRef = ref();
+const uploading = ref(false);
+const importResult = ref<{
+  success_count: number;
+  failed_count: number;
+  total: number;
+  errors: string[];
+} | null>(null);
+
+// 打开批量导入对话框
+const handleBatchImport = () => {
+  importResult.value = null;
+  importDialogVisible.value = true;
+};
+
+// 上传前检查
+const beforeUpload = (file: File) => {
+  const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
+  if (!isCSV) {
+    ElMessage.error("只能上传CSV文件");
+    return false;
+  }
+  const isLt10M = file.size / 1024 / 1024 < 10;
+  if (!isLt10M) {
+    ElMessage.error("文件大小不能超过10MB");
+    return false;
+  }
+  return true;
+};
+
+// 处理文件上传
+const handleFileUpload = async (options: any) => {
+  uploading.value = true;
+  try {
+    const res = await batchImportWebsites(options.file);
+    importResult.value = res.data;
+
+    if (res.success) {
+      ElMessage.success(res.message || "导入成功");
+      loadWebsites();
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || "导入失败");
+  } finally {
+    uploading.value = false;
+  }
+};
+
+// 下载模板
+const downloadTemplate = () => {
+  const csvContent = "name,url,depth,maxLinks\n示例网站,https://example.com,3,1000";
+  const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", "website_import_template.csv");
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// 关闭导入对话框
+const handleImportDialogClose = () => {
+  importDialogVisible.value = false;
+  if (uploadRef.value) {
+    uploadRef.value.clearFiles();
+  }
+  importResult.value = null;
+};
+
 onMounted(() => {
   loadWebsites();
 });
@@ -191,6 +266,9 @@ onMounted(() => {
           <el-button type="primary" @click="handleQuery">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
           <el-button type="success" @click="handleAdd">添加网站</el-button>
+          <el-button type="warning" :icon="Upload" @click="handleBatchImport">
+            批量导入
+          </el-button>
         </div>
       </div>
     </el-card>
@@ -289,6 +367,98 @@ onMounted(() => {
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleSubmit">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 批量导入对话框 -->
+    <el-dialog
+      v-model="importDialogVisible"
+      title="批量导入网站"
+      width="600px"
+      :close-on-click-modal="false"
+      @close="handleImportDialogClose"
+    >
+      <div class="mb-4">
+        <el-alert
+          title="导入说明"
+          type="info"
+          :closable="false"
+          class="mb-4"
+        >
+          <p>1. CSV文件必须包含表头: name, url, depth, maxLinks</p>
+          <p>2. name和url是必填字段，depth和maxLinks是可选字段</p>
+          <p>3. depth默认为3，maxLinks默认为1000</p>
+          <p>4. 文件大小不能超过10MB</p>
+        </el-alert>
+        <el-button type="primary" size="small" @click="downloadTemplate">
+          下载模板文件
+        </el-button>
+      </div>
+
+      <el-upload
+        ref="uploadRef"
+        drag
+        :auto-upload="false"
+        :limit="1"
+        accept=".csv"
+        :before-upload="beforeUpload"
+        :http-request="handleFileUpload"
+        :on-exceed="() => ElMessage.warning('只能上传一个文件')"
+      >
+        <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+        <div class="el-upload__text">
+          将CSV文件拖到此处，或<em>点击上传</em>
+        </div>
+        <template #tip>
+          <div class="el-upload__tip">只支持CSV格式文件，且不超过10MB</div>
+        </template>
+      </el-upload>
+
+      <!-- 导入结果 -->
+      <div v-if="importResult" class="mt-4">
+        <el-divider>导入结果</el-divider>
+        <el-descriptions :column="3" border>
+          <el-descriptions-item label="总计">
+            {{ importResult.total }}
+          </el-descriptions-item>
+          <el-descriptions-item label="成功">
+            <el-tag type="success">{{ importResult.success_count }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="失败">
+            <el-tag type="danger">{{ importResult.failed_count }}</el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 错误详情 -->
+        <div v-if="importResult.errors.length > 0" class="mt-4">
+          <el-alert title="导入失败详情" type="error" :closable="false">
+            <ul class="list-disc list-inside">
+              <li v-for="(error, index) in importResult.errors" :key="index">
+                {{ error }}
+              </li>
+              <li
+                v-if="importResult.failed_count > importResult.errors.length"
+                class="text-gray-500"
+              >
+                ... 还有 {{ importResult.failed_count - importResult.errors.length }} 条错误未显示
+              </li>
+            </ul>
+          </el-alert>
+        </div>
+      </div>
+
+      <template #footer>
+        <el-button @click="handleImportDialogClose">
+          {{ importResult ? "关闭" : "取消" }}
+        </el-button>
+        <el-button
+          v-if="!importResult"
+          type="primary"
+          :loading="uploading"
+          @click="uploadRef.submit()"
+        >
+          {{ uploading ? "导入中..." : "开始导入" }}
+        </el-button>
       </template>
     </el-dialog>
   </div>

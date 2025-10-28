@@ -93,3 +93,27 @@ export const deleteWebsite = (websiteId: string) => {
     `/websites/${websiteId}`
   );
 };
+
+/** 批量导入响应 */
+export type BatchImportResult = {
+  success: boolean;
+  message: string;
+  data: {
+    success_count: number;
+    failed_count: number;
+    total: number;
+    errors: string[];
+  };
+};
+
+/** 批量导入网站 */
+export const batchImportWebsites = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return http.request<BatchImportResult>("post", "/websites/batch-import", {
+    data: formData,
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+};

@@ -5,6 +5,8 @@ from flask import request
 from bson import ObjectId
 from bson.errors import InvalidId
 from urllib.parse import urlparse
+import csv
+import io
 
 from . import websites_bp
 from ..database import get_db
@@ -183,3 +185,138 @@ def delete_website(website_id):
         return error_response('网站ID格式无效', 400)
     except Exception as e:
         return error_response(f'删除网站失败: {str(e)}', 500)
+
+
+@websites_bp.route('/batch-import', methods=['POST'])
+def batch_import_websites():
+    """批量导入网站（CSV）"""
+    try:
+        # 检查是否有文件
+        if 'file' not in request.files:
+            return error_response('未找到上传的文件', 400)
+
+        file = request.files['file']
+        if file.filename == '':
+            return error_response('未选择文件', 400)
+
+        # 检查文件类型
+        if not file.filename.endswith('.csv'):
+            return error_response('只支持CSV文件', 400)
+
+        # 读取文件内容
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        csv_reader = csv.DictReader(stream)
+
+        # 验证CSV表头
+        required_fields = ['name', 'url']
+
+        if not csv_reader.fieldnames:
+            return error_response('CSV文件为空', 400)
+
+        # 检查必填字段
+        missing_fields = [field for field in required_fields if field not in csv_reader.fieldnames]
+        if missing_fields:
+            return error_response(f'CSV文件缺少必填字段: {", ".join(missing_fields)}', 400)
+
+        # 处理数据
+        db = get_db()
+        success_count = 0
+        failed_count = 0
+        errors = []
+
+        for row_num, row in enumerate(csv_reader, start=2):  # start=2 因为第1行是表头
+            try:
+                # 获取必填字段
+                name = row.get('name', '').strip()
+                url = row.get('url', '').strip()
+
+                if not name:
+                    errors.append(f'第{row_num}行: 网站名称不能为空')
+                    failed_count += 1
+                    continue
+
+                if not url:
+                    errors.append(f'第{row_num}行: 网站URL不能为空')
+                    failed_count += 1
+                    continue
+
+                # 验证URL
+                is_valid, msg = validate_url(url)
+                if not is_valid:
+                    errors.append(f'第{row_num}行: {msg}')
+                    failed_count += 1
+                    continue
+
+                # 检查URL是否已存在
+                existing = db.websites.find_one({'url': url})
+                if existing:
+                    errors.append(f'第{row_num}行: URL {url} 已存在')
+                    failed_count += 1
+                    continue
+
+                # 获取可选字段
+                crawl_depth = 3  # 默认值
+                max_links = 1000  # 默认值
+
+                if 'depth' in row and row['depth'].strip():
+                    try:
+                        crawl_depth = int(row['depth'])
+                        if crawl_depth < 1:
+                            errors.append(f'第{row_num}行: 爬取深度必须大于0')
+                            failed_count += 1
+                            continue
+                    except ValueError:
+                        errors.append(f'第{row_num}行: 爬取深度必须是整数')
+                        failed_count += 1
+                        continue
+
+                if 'maxLinks' in row and row['maxLinks'].strip():
+                    try:
+                        max_links = int(row['maxLinks'])
+                        if max_links < 1:
+                            errors.append(f'第{row_num}行: 最大链接数必须大于0')
+                            failed_count += 1
+                            continue
+                    except ValueError:
+                        errors.append(f'第{row_num}行: 最大链接数必须是整数')
+                        failed_count += 1
+                        continue
+
+                # 提取域名
+                parsed_url = urlparse(url)
+                domain = parsed_url.netloc
+
+                # 创建网站文档
+                website_doc = WebsiteModel.create(
+                    name=name,
+                    url=url,
+                    domain=domain,
+                    crawl_depth=crawl_depth,
+                    max_links=max_links
+                )
+
+                # 插入数据库
+                db.websites.insert_one(website_doc)
+                success_count += 1
+
+            except Exception as e:
+                errors.append(f'第{row_num}行: {str(e)}')
+                failed_count += 1
+
+        # 返回导入结果
+        result = {
+            'success_count': success_count,
+            'failed_count': failed_count,
+            'total': success_count + failed_count,
+            'errors': errors[:10]  # 只返回前10个错误
+        }
+
+        if success_count == 0:
+            return error_response('所有网站导入失败', 400, result)
+        elif failed_count > 0:
+            return success_response(result, f'部分导入成功: 成功{success_count}个，失败{failed_count}个')
+        else:
+            return success_response(result, f'全部导入成功: {success_count}个网站')
+
+    except Exception as e:
+        return error_response(f'批量导入失败: {str(e)}', 500)
