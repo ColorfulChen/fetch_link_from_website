@@ -320,3 +320,31 @@ def batch_import_websites():
 
     except Exception as e:
         return error_response(f'批量导入失败: {str(e)}', 500)
+
+
+@websites_bp.route('/by-url', methods=['GET'])
+def get_website_by_url():
+    """根据URL查询网站ID"""
+    try:
+        # 获取查询参数
+        url = request.args.get('url')
+
+        if not url:
+            return error_response('URL参数不能为空', 400)
+
+        # 验证URL格式
+        is_valid, msg = validate_url(url)
+        if not is_valid:
+            return error_response(msg, 400)
+
+        # 查询数据库
+        db = get_db()
+        website = db.websites.find_one({'url': url})
+
+        if not website:
+            return error_response('未找到该URL对应的网站', 404)
+
+        return success_response(WebsiteModel.to_dict(website))
+
+    except Exception as e:
+        return error_response(f'查询失败: {str(e)}', 500)

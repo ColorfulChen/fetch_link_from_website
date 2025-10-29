@@ -329,7 +329,62 @@ Content-Type: application/json
 
 ---
 
-### 5. 删除网站
+### 5. 根据URL查询网站
+
+根据完整的URL查询网站信息和ID。
+
+**请求**
+
+```http
+GET /api/websites/by-url?url={website_url}
+```
+
+**查询参数**
+
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| url | string | 是 | 网站完整URL（需要URL编码） |
+
+**请求示例**
+
+```bash
+GET /api/websites/by-url?url=https%3A%2F%2Fwww.baidu.com
+```
+
+**响应**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "507f1f77bcf86cd799439011",
+    "name": "百度",
+    "url": "https://www.baidu.com",
+    "domain": "www.baidu.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": "2025-10-22T10:00:00Z",
+    "updated_at": "2025-10-22T10:00:00Z"
+  }
+}
+```
+
+**错误码**
+
+- `400`: URL参数为空或格式无效
+- `404`: 未找到该URL对应的网站
+- `500`: 服务器内部错误
+
+**使用场景**
+
+- 在批量导入前检查URL是否已存在
+- 通过URL快速获取网站ID用于后续操作
+- 验证URL是否已在系统中注册
+
+---
+
+### 6. 删除网站
 
 删除指定的网站（不会删除相关的任务和链接数据）。
 
