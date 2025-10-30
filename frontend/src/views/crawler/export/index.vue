@@ -81,7 +81,11 @@ const exporting = ref(false);
 // 加载网站列表
 const loadWebsites = async () => {
   try {
-    const res = await getWebsites({ status: "active" });
+    const res = await getWebsites({
+      status: "active",
+      page: 1,
+      page_size: 1000
+    });
     if (res.success) {
       websiteList.value = res.data;
     }
