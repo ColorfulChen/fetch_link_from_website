@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//workspace/python/fetch_link_from_website/docs/**)",
+      "Bash(tree:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

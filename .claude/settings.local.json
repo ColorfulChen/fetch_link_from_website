@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(WEBSITE_ID=\"68fb2bf16c550f6817fdb9c7\")",
+      "Bash(echo:*)",
+      "Bash(cat:*)",
+      "Bash(python auto_crawl_from_csv.py:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

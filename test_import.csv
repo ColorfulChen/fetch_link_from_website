@@ -1,0 +1,6 @@
+name,url,depth,maxLinks
+示例网站1,https://example1.com,3,1000
+示例网站2,https://example2.com,2,500
+百度,https://www.baidu.com,4,2000
+谷歌,https://www.google.com,,
+测试站点,https://test.example.org,5,3000
