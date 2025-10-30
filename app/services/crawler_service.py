@@ -140,8 +140,8 @@ class CriticalLinkDetector:
         """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
         url_lower = (link_url or '').lower()
         score = 0.0
-        score += self._analyze_text_content(url_lower) * 0.4
-        score += self._analyze_position(url_lower) * 0.4
+        score += self._analyze_text_content(url_lower) * 0.6
+        score += self._analyze_position(url_lower) * 0.2
         score += self._analyze_visual_features(url_lower) * 0.2
         return min(max(score, 0.0), 1.0)
 
@@ -673,29 +673,30 @@ class CrawlerService:
             invalid_links = 0
             err_link = 0
 
-            domain_set = set()
-            try:
-                domain_file = Path('domain.json')
-                if domain_file.exists():
-                    with domain_file.open('r', encoding='utf-8') as f:
-                        data = json.load(f)
-                        if isinstance(data, dict):
-                            domain_set = set(data.get('domains', []))
-                        elif isinstance(data, list):
-                            domain_set = set(data)
-            except Exception as e:
-                print(f"读取domain.json失败: {e}")
+            # domain_set = set()
+            # try:
+            #     domain_file = Path('domain.json')
+            #     if domain_file.exists():
+            #         with domain_file.open('r', encoding='utf-8') as f:
+            #             data = json.load(f)
+            #             if isinstance(data, dict):
+            #                 domain_set = set(data.get('domains', []))
+            #             elif isinstance(data, list):
+            #                 domain_set = set(data)
+            # except Exception as e:
+            #     print(f"读取domain.json失败: {e}")
 
             for r in results:
                 if r.get('content_path'):
                     valid_links += 1
-                    if r.get('importance_score') > 0.5:
+                    if r.get('importance_score') < 0.4:
                         invalid_links += 1
                         r['link_type'] = 'invalid'
                     else:
                         # 仅当域名在 domain.json 中时才计入 err_link
-                        domain = urlparse(r.get('link', '')).netloc
-                        if domain and domain in domain_set:
+                        domain = r.get('url', '')
+                        # if domain and domain in domain_set:
+                        if 'ad' in domain.lower() or 'ads' in domain.lower():
                             err_link += 1
             # valid_links = len([r for r in results if r.get('content_path')])
             # invalid_links = total_links - valid_links
