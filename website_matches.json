@@ -1,0 +1,1702 @@
+[
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a67d"
+    },
+    "name": "香港科技大学 (HKUST)",
+    "url": "https://hkust.edu.hk/",
+    "domain": "hkust.edu.hk",
+    "status": "active",
+    "crawl_depth": 1,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.205Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.205Z"
+    }
+  },
+    {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a68e"
+    },
+    "name": "奥克兰大学",
+    "url": "https://www.auckland.ac.nz/",
+    "domain": "www.auckland.ac.nz",
+    "status": "active",
+    "crawl_depth": 1,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.347Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.347Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319425be9f6814fd5a6a4"
+    },
+    "name": "Dockerhub",
+    "url": "https://dockerhub.com/",
+    "domain": "dockerhub.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:34.040Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:34.040Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319415be9f6814fd5a6a3"
+    },
+    "name": "Github",
+    "url": "https://github.com/",
+    "domain": "github.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:33.860Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:33.860Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319435be9f6814fd5a6ac"
+    },
+    "name": "Huggingface",
+    "url": "https://huggingface.co/",
+    "domain": "huggingface.co",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:35.764Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:35.764Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a693"
+    },
+    "name": "伊利诺伊大学香槟分校",
+    "url": "https://illinois.edu/",
+    "domain": "illinois.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.150Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.150Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5bf2db525cd804816b"
+    },
+    "name": "Medium",
+    "url": "https://medium.com",
+    "domain": "medium.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:27.302Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:27.302Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319425be9f6814fd5a6a7"
+    },
+    "name": "GooglePatents",
+    "url": "https://patents.google.com/",
+    "domain": "patents.google.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:34.834Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:34.834Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a668"
+    },
+    "name": "巴黎科学艺术人文大学",
+    "url": "https://psl.eu/",
+    "domain": "psl.eu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.202Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.202Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319435be9f6814fd5a6a8"
+    },
+    "name": "GoogleSchloar",
+    "url": "https://scholar.google.com",
+    "domain": "scholar.google.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:35.019Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:35.019Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5bf2db525cd804816a"
+    },
+    "name": "Stack Overflow",
+    "url": "https://stackoverflow.com",
+    "domain": "stackoverflow.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:27.132Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:27.132Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a695"
+    },
+    "name": "加州大学圣地亚哥分校",
+    "url": "https://ucsd.edu/",
+    "domain": "ucsd.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.479Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.479Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a692"
+    },
+    "name": "华威大学",
+    "url": "https://warwick.ac.uk/",
+    "domain": "warwick.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.984Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.984Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319415be9f6814fd5a69f"
+    },
+    "name": "阿德莱德大学",
+    "url": "https://www.adelaide.edu.au/",
+    "domain": "www.adelaide.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:33.152Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:33.152Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319385be9f6814fd5a66e"
+    },
+    "name": "澳大利亚国立大学 (ANU)",
+    "url": "https://www.anu.edu.au/",
+    "domain": "www.anu.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:24.321Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:24.321Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319355be9f6814fd5a65e"
+    },
+    "name": "加州大学伯克利分校",
+    "url": "https://www.berkeley.edu/",
+    "domain": "www.berkeley.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:21.341Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:21.341Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a69d"
+    },
+    "name": "伯明翰大学",
+    "url": "https://www.birmingham.ac.uk/",
+    "domain": "www.birmingham.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.808Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.808Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193c5be9f6814fd5a683"
+    },
+    "name": "布里斯托大学",
+    "url": "https://www.bristol.ac.uk/",
+    "domain": "www.bristol.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:28.321Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:28.321Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a69c"
+    },
+    "name": "布朗大学",
+    "url": "https://www.brown.edu/",
+    "domain": "www.brown.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.633Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.633Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a65c"
+    },
+    "name": "加州理工大学 (Caltech)",
+    "url": "https://www.caltech.edu/",
+    "domain": "www.caltech.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.958Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.958Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a657"
+    },
+    "name": "剑桥大学",
+    "url": "https://www.cam.ac.uk/",
+    "domain": "www.cam.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.022Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.022Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a68b"
+    },
+    "name": "香港城市大学",
+    "url": "https://www.cityu.edu.hk/",
+    "domain": "www.cityu.edu.hk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.812Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.812Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a687"
+    },
+    "name": "卡内基梅隆大学",
+    "url": "https://www.cmu.edu/",
+    "domain": "www.cmu.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.068Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.068Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319395be9f6814fd5a672"
+    },
+    "name": "哥伦比亚大学",
+    "url": "https://www.columbia.edu/",
+    "domain": "www.columbia.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:25.085Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:25.085Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319355be9f6814fd5a661"
+    },
+    "name": "康奈尔大学",
+    "url": "https://www.cornell.edu/",
+    "domain": "www.cornell.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:21.907Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:21.907Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319395be9f6814fd5a674"
+    },
+    "name": "香港中文大学",
+    "url": "https://www.cuhk.edu.hk/english/index.html",
+    "domain": "www.cuhk.edu.hk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:25.478Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:25.478Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5af2db525cd8048165"
+    },
+    "name": "Discord",
+    "url": "https://www.discord.com",
+    "domain": "www.discord.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:26.290Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:26.290Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5af2db525cd8048168"
+    },
+    "name": "Dropbox",
+    "url": "https://www.dropbox.com",
+    "domain": "www.dropbox.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:26.780Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:26.780Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a68a"
+    },
+    "name": "杜克大学",
+    "url": "https://www.duke.edu/",
+    "domain": "www.duke.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.633Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.633Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a66b"
+    },
+    "name": "爱丁堡大学",
+    "url": "https://www.ed.ac.uk/",
+    "domain": "www.ed.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.758Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.758Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a66a"
+    },
+    "name": "洛桑联邦理工学院 (EPFL)",
+    "url": "https://www.epfl.ch/",
+    "domain": "www.epfl.ch",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.571Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.571Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a659"
+    },
+    "name": "苏黎世联邦理工大学 (瑞士联邦理工学院)",
+    "url": "https://www.ethz.ch/en.html",
+    "domain": "www.ethz.ch",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.396Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.396Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319435be9f6814fd5a6aa"
+    },
+    "name": "Facebook",
+    "url": "https://www.facebook.com/",
+    "domain": "www.facebook.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:35.396Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:35.396Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a69b"
+    },
+    "name": "格拉斯哥大学",
+    "url": "https://www.gla.ac.uk/",
+    "domain": "www.gla.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.458Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.458Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319425be9f6814fd5a6a6"
+    },
+    "name": "GoogleSearch",
+    "url": "https://www.google.com/",
+    "domain": "www.google.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:34.664Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:34.664Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319335be9f6814fd5a656"
+    },
+    "name": "哈佛大学",
+    "url": "https://www.harvard.edu/",
+    "domain": "www.harvard.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:19.835Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:19.835Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319365be9f6814fd5a662"
+    },
+    "name": "香港大学 (HKU)",
+    "url": "https://www.hku.hk/",
+    "domain": "www.hku.hk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:22.079Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:22.079Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319335be9f6814fd5a654"
+    },
+    "name": "帝国理工学院",
+    "url": "https://www.imperial.ac.uk/",
+    "domain": "www.imperial.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:19.467Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:19.467Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319385be9f6814fd5a670"
+    },
+    "name": "约翰霍普金斯大学",
+    "url": "https://www.jhu.edu/",
+    "domain": "www.jhu.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:24.705Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:24.705Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193c5be9f6814fd5a682"
+    },
+    "name": "韩国科学技术研究所",
+    "url": "https://www.kaist.ac.kr/en/",
+    "domain": "www.kaist.ac.kr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:28.123Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:28.123Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193a5be9f6814fd5a677"
+    },
+    "name": "伦敦国王学院",
+    "url": "https://www.kcl.ac.uk/",
+    "domain": "www.kcl.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:26.050Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:26.050Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a690"
+    },
+    "name": "高丽大学",
+    "url": "https://www.korea.ac.kr/eng/index.jsp",
+    "domain": "www.korea.ac.kr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.661Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.661Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a697"
+    },
+    "name": "皇家理工学院",
+    "url": "https://www.kth.se/en",
+    "domain": "www.kth.se",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.797Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.797Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a68c"
+    },
+    "name": "鲁汶大学",
+    "url": "https://www.kuleuven.be/en",
+    "domain": "www.kuleuven.be",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.993Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.993Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a67f"
+    },
+    "name": "京都大学",
+    "url": "https://www.kyoto-u.ac.jp/en",
+    "domain": "www.kyoto-u.ac.jp",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.577Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.577Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319415be9f6814fd5a6a0"
+    },
+    "name": "利兹大学",
+    "url": "https://www.leeds.ac.uk/",
+    "domain": "www.leeds.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:33.326Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:33.326Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a681"
+    },
+    "name": "伦敦经济政治学院",
+    "url": "https://www.lse.ac.uk/",
+    "domain": "www.lse.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.936Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.936Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a698"
+    },
+    "name": "隆德大学",
+    "url": "https://www.lu.se/en",
+    "domain": "www.lu.se",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.959Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.959Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319395be9f6814fd5a673"
+    },
+    "name": "曼彻斯特大学",
+    "url": "https://www.manchester.ac.uk/",
+    "domain": "www.manchester.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:25.284Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:25.284Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319385be9f6814fd5a66d"
+    },
+    "name": "麦吉尔大学",
+    "url": "https://www.mcgill.ca/",
+    "domain": "www.mcgill.ca",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:24.135Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:24.135Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319335be9f6814fd5a653"
+    },
+    "name": "麻省理工学院",
+    "url": "https://www.mit.edu/",
+    "domain": "www.mit.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:19.287Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:19.287Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319395be9f6814fd5a675"
+    },
+    "name": "蒙纳士大学",
+    "url": "https://www.monash.edu/",
+    "domain": "www.monash.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:25.671Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:25.671Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a680"
+    },
+    "name": "西北大学",
+    "url": "https://www.northwestern.edu/",
+    "domain": "www.northwestern.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.751Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.751Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319355be9f6814fd5a660"
+    },
+    "name": "南洋理工大学",
+    "url": "https://www.ntu.edu.sg/Pages/home.aspx",
+    "domain": "www.ntu.edu.sg",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:21.726Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:21.726Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a691"
+    },
+    "name": "台湾大学",
+    "url": "https://www.ntu.edu.tw/en/",
+    "domain": "www.ntu.edu.tw",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.819Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.819Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a65a"
+    },
+    "name": "新加坡国立大学",
+    "url": "https://www.nus.edu.sg/",
+    "domain": "www.nus.edu.sg",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.583Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.583Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193a5be9f6814fd5a67a"
+    },
+    "name": "纽约大学 (NYU)",
+    "url": "https://www.nyu.edu/",
+    "domain": "www.nyu.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:26.632Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:26.632Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319335be9f6814fd5a655"
+    },
+    "name": "牛津大学",
+    "url": "https://www.ox.ac.uk/",
+    "domain": "www.ox.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:19.655Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:19.655Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a67c"
+    },
+    "name": "巴黎理工学院",
+    "url": "https://www.polytechnique.edu/",
+    "domain": "www.polytechnique.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.012Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.012Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193c5be9f6814fd5a686"
+    },
+    "name": "香港理工大学",
+    "url": "https://www.polyu.edu.hk/en/",
+    "domain": "www.polyu.edu.hk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:28.879Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:28.879Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319365be9f6814fd5a666"
+    },
+    "name": "普林斯顿大学",
+    "url": "https://www.princeton.edu/",
+    "domain": "www.princeton.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:22.829Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:22.829Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5bf2db525cd804816c"
+    },
+    "name": "Quora",
+    "url": "https://www.quora.com",
+    "domain": "www.quora.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:27.467Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:27.467Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5af2db525cd8048167"
+    },
+    "name": "Slack",
+    "url": "https://www.slack.com",
+    "domain": "www.slack.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:26.615Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:26.615Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319385be9f6814fd5a66f"
+    },
+    "name": "首尔国立大学",
+    "url": "https://www.snu.ac.kr/eng/index.do",
+    "domain": "www.snu.ac.kr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:24.505Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:24.505Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a68d"
+    },
+    "name": "索邦大学",
+    "url": "https://www.sorbonne-universite.fr/en",
+    "domain": "www.sorbonne-universite.fr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.181Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.181Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a69e"
+    },
+    "name": "南安普敦大学",
+    "url": "https://www.southampton.ac.uk/",
+    "domain": "www.southampton.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.981Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.981Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc59f2db525cd8048163"
+    },
+    "name": "Spotify",
+    "url": "https://www.spotify.com",
+    "domain": "www.spotify.com",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:25.956Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:25.956Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a658"
+    },
+    "name": "斯坦福大学",
+    "url": "https://www.stanford.edu/",
+    "domain": "www.stanford.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.210Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.210Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319365be9f6814fd5a663"
+    },
+    "name": "悉尼大学",
+    "url": "https://www.sydney.edu.au/",
+    "domain": "www.sydney.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:22.264Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:22.264Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc59f2db525cd8048162"
+    },
+    "name": "Telegram",
+    "url": "https://www.telegram.org",
+    "domain": "www.telegram.org",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:25.777Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:25.777Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319415be9f6814fd5a6a2"
+    },
+    "name": "东京工业大学",
+    "url": "https://www.titech.ac.jp/en/",
+    "domain": "www.titech.ac.jp",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:33.689Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:33.689Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193b5be9f6814fd5a67e"
+    },
+    "name": "代尔夫特理工大学",
+    "url": "https://www.tudelft.nl/en",
+    "domain": "www.tudelft.nl",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:27.391Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:27.391Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a66c"
+    },
+    "name": "慕尼黑工业大学",
+    "url": "https://www.tum.de/en/",
+    "domain": "www.tum.de",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.945Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.945Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5af2db525cd8048164"
+    },
+    "name": "Twitch",
+    "url": "https://www.twitch.tv",
+    "domain": "www.twitch.tv",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:26.125Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:26.125Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319385be9f6814fd5a671"
+    },
+    "name": "东京大学",
+    "url": "https://www.u-tokyo.ac.jp/en/index.html",
+    "domain": "www.u-tokyo.ac.jp",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:24.896Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:24.896Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a694"
+    },
+    "name": "布宜诺斯艾利斯大学",
+    "url": "https://www.uba.ar/en/",
+    "domain": "www.uba.ar",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.319Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.319Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319395be9f6814fd5a676"
+    },
+    "name": "不列颠哥伦比亚大学",
+    "url": "https://www.ubc.ca/",
+    "domain": "www.ubc.ca",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:25.858Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:25.858Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319365be9f6814fd5a665"
+    },
+    "name": "芝加哥大学",
+    "url": "https://www.uchicago.edu/",
+    "domain": "www.uchicago.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:22.639Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:22.639Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319345be9f6814fd5a65b"
+    },
+    "name": "伦敦大学学院",
+    "url": "https://www.ucl.ac.uk/",
+    "domain": "www.ucl.ac.uk",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:20.773Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:20.773Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193a5be9f6814fd5a679"
+    },
+    "name": "加州大学洛杉矶分校",
+    "url": "https://www.ucla.edu/",
+    "domain": "www.ucla.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:26.440Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:26.440Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a689"
+    },
+    "name": "马来亚大学 (UM)",
+    "url": "https://www.um.edu.my/",
+    "domain": "www.um.edu.my",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.449Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.449Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193a5be9f6814fd5a67b"
+    },
+    "name": "密歇根大学",
+    "url": "https://www.umich.edu/",
+    "domain": "www.umich.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:26.826Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:26.826Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319415be9f6814fd5a6a1"
+    },
+    "name": "鲁普莱希特 - 卡尔斯 - 海德堡大学",
+    "url": "https://www.uni-heidelberg.de/en.html",
+    "domain": "www.uni-heidelberg.de",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:33.507Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:33.507Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193d5be9f6814fd5a688"
+    },
+    "name": "路德维希 - 马克西米利安 - 慕尼黑大学",
+    "url": "https://www.uni-muenchen.de/en.html\nhttps://www.lmu.de/（跳转到后的地址）",
+    "domain": "www.uni-muenchen.de",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:29.257Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:29.257Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319355be9f6814fd5a65f"
+    },
+    "name": "墨尔本大学",
+    "url": "https://www.unimelb.edu.au/",
+    "domain": "www.unimelb.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:21.532Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:21.532Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193f5be9f6814fd5a696"
+    },
+    "name": "巴黎萨克雷大学",
+    "url": "https://www.universite-paris-saclay.fr/en",
+    "domain": "www.universite-paris-saclay.fr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:31.636Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:31.636Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319365be9f6814fd5a664"
+    },
+    "name": "新南威尔士大学 (UNSW)",
+    "url": "https://www.unsw.edu.au/8",
+    "domain": "www.unsw.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:22.454Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:22.454Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319355be9f6814fd5a65d"
+    },
+    "name": "宾夕法尼亚大学",
+    "url": "https://www.upenn.edu/",
+    "domain": "www.upenn.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:21.147Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:21.147Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193a5be9f6814fd5a678"
+    },
+    "name": "昆士兰大学 (UQ)",
+    "url": "https://www.uq.edu.au/",
+    "domain": "www.uq.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:26.241Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:26.241Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193e5be9f6814fd5a68f"
+    },
+    "name": "德克萨斯大学奥斯汀分校",
+    "url": "https://www.utexas.edu/",
+    "domain": "www.utexas.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:30.499Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:30.499Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a669"
+    },
+    "name": "多伦多大学",
+    "url": "https://www.utoronto.ca/",
+    "domain": "www.utoronto.ca",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.388Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.388Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193c5be9f6814fd5a684"
+    },
+    "name": "阿姆斯特丹大学",
+    "url": "https://www.uva.nl/en.html",
+    "domain": "www.uva.nl",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:28.503Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:28.503Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a69a"
+    },
+    "name": "西澳大学 (UWA)",
+    "url": "https://www.uwa.edu.au/",
+    "domain": "www.uwa.edu.au",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.284Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.284Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319405be9f6814fd5a699"
+    },
+    "name": "华盛顿大学",
+    "url": "https://www.washington.edu/",
+    "domain": "www.washington.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:32.119Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:32.119Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319375be9f6814fd5a667"
+    },
+    "name": "耶鲁大学",
+    "url": "https://www.yale.edu/",
+    "domain": "www.yale.edu",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:23.017Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:23.017Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6903193c5be9f6814fd5a685"
+    },
+    "name": "延世大学",
+    "url": "https://www.yonsei.ac.kr/en/index.jsp",
+    "domain": "www.yonsei.ac.kr",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:28.693Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:28.693Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319425be9f6814fd5a6a5"
+    },
+    "name": "Youtube",
+    "url": "https://www.youtube.com/",
+    "domain": "www.youtube.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:34.506Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:34.506Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6901dc5af2db525cd8048166"
+    },
+    "name": "Zoom",
+    "url": "https://www.zoom.us",
+    "domain": "www.zoom.us",
+    "status": "active",
+    "crawl_depth": 3,
+    "max_links": 1000,
+    "created_at": {
+      "$date": "2025-10-29T09:20:26.457Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-29T09:20:26.457Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319435be9f6814fd5a6a9"
+    },
+    "name": "Twitter",
+    "url": "https://x.com/",
+    "domain": "x.com",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:35.202Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:35.202Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690319435be9f6814fd5a6ab"
+    },
+    "name": "Wikipedia",
+    "url": "https://zh.wikipedia.org/",
+    "domain": "zh.wikipedia.org",
+    "status": "active",
+    "crawl_depth": 2,
+    "max_links": 5000,
+    "created_at": {
+      "$date": "2025-10-30T07:52:35.583Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T07:52:35.583Z"
+    }
+  }
+]

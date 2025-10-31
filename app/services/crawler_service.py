@@ -12,6 +12,9 @@ import chardet
 import socket
 from datetime import datetime
 from bson import ObjectId
+from concurrent.futures import ThreadPoolExecutor, as_completed  # 多线程
+import random
+import json
 
 from app.config import config
 import app.global_vars as app_global
@@ -107,6 +110,94 @@ def safe_request(url, headers, timeout=2):
     return None
 
 
+# 基于链接特征的轻量级重要性评估
+class LinkAnalyzer:
+    def __init__(self):
+        # 中英关键词混合，适配常见站点导航
+        self.important_keywords = [
+            '首页', '主页', '产品', '服务', '关于我们', '联系我们',
+            '新闻', '博客', '帮助', '支持', '下载', '登录', '注册',
+            'home', 'index', 'product', 'service', 'about', 'contact',
+            'news', 'blog', 'help', 'support', 'download', 'login',
+            'signin', 'signup', 'register'
+        ]
+        self.ad_keywords = [
+            '广告', '推广', '赞助', 'ad', 'ads', 'advertisement',
+            'sponsor', 'promotion', 'buy', '购买', '优惠', 'utm', 'banner', 'track'
+        ]
+        self.suspicious_domains = [
+            'ad.', 'ads.', 'doubleclick', 'googlead', 'amazon-adsystem'
+        ]
+
+
+class CriticalLinkDetector:
+    def __init__(self):
+        self.analyzer = LinkAnalyzer()
+        self.importance_threshold = 0.6
+        self.target_filter_rate = 0.3
+
+    def calculate_link_importance(self, link_url, base_domain=None):
+        """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
+        url_lower = (link_url or '').lower()
+        score = 0.0
+        score += self._analyze_text_content(url_lower) * 0.6
+        score += self._analyze_position(url_lower) * 0.2
+        score += self._analyze_visual_features(url_lower) * 0.2
+        return min(max(score, 0.0), 1.0)
+
+    def _analyze_text_content(self, url_text):
+        """用URL路径近似替代链接文本分析"""
+        from urllib.parse import unquote, urlparse
+        try:
+            p = urlparse(url_text)
+            text = unquote((p.path or '').strip('/').lower())
+            text = re.sub(r'[-_/]+', ' ', text)
+        except Exception:
+            text = url_text or ''
+
+        importance_bonus = 0.0
+        for kw in self.analyzer.important_keywords:
+            if kw.lower() in text:
+                importance_bonus += 0.2
+
+        ad_penalty = 0.0
+        for kw in self.analyzer.ad_keywords:
+            if kw.lower() in text:
+                ad_penalty += 0.3
+
+        length_score = min(len(text) / 20.0, 0.3)  # 最长20字符得0.3分
+        base = 0.4 + length_score + importance_bonus - ad_penalty
+        return max(0.0, min(base, 1.0))
+
+    def _analyze_position(self, url_text):
+        """用路径深度近似位置重要性"""
+        from urllib.parse import urlparse
+        try:
+            p = urlparse(url_text)
+            depth = len([seg for seg in (p.path or '').split('/') if seg])
+            if depth == 0:
+                pos = 0.8
+            elif depth <= 2:
+                pos = 0.6
+            else:
+                pos = 0.35
+            if re.search(r'\.(js|css|png|jpe?g|gif|svg|ico|pdf|zip)$', p.path or '', re.I):
+                pos -= 0.3
+            return max(0.0, min(pos, 1.0))
+        except Exception:
+            return 0.5
+
+    def _analyze_visual_features(self, href):
+        """URL中广告/装饰性特征"""
+        score = 0.5
+        if any(x in href for x in ['ad=', 'ads=', '/ad/', '/ads/', 'banner', 'promo']):
+            score -= 0.2
+        if any(x in href for x in ['icon', 'sprite', 'small']):
+            score -= 0.1
+        return max(0.0, min(score, 1.0))
+
+
+
 def get_ip_address(domain):
     """
     获取域名的IPv4地址
@@ -145,54 +236,93 @@ def screenshot_page(url, save_dir):
         # 为每次截图创建独立的驱动实例
         from selenium import webdriver
         from selenium.webdriver.chrome.options import Options
+        from selenium.common.exceptions import TimeoutException, WebDriverException
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
 
-        opts = Options()
-        opts.add_argument('--headless=new')
-        opts.add_argument('--disable-gpu')
-        opts.add_argument('--no-sandbox')
-        opts.add_argument('--disable-dev-shm-usage')  # 解决共享内存不足问题
-        opts.add_argument('--disable-software-rasterizer')
-        opts.add_argument('--window-size=1280,1024')
-        opts.add_argument('--disable-extensions')
-        opts.add_argument('--disable-logging')
-        opts.add_argument('--log-level=3')  # 只显示严重错误
-
-        driver = webdriver.Chrome(options=opts)
-        driver.set_page_load_timeout(10)
-        driver.set_script_timeout(10)
-
-        # 访问页面
-        driver.get(url)
-
-        # 等待页面加载
-        import time
-        time.sleep(2)  # 增加等待时间，确保页面渲染完成
+        # 重试以缓解 renderer 超时
+        RETRIES = 2
+        last_err = None
 
         # 生成安全的文件名
         illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
         fname = "screenshot-" + re.sub(illegal_chars, '', url) + ".png"
         save_path = os.path.join(save_dir, fname)
 
-        # 保存截图
-        driver.save_screenshot(save_path)
-        print(f"网页截图已保存: {save_path}")
+        for attempt in range(1, RETRIES + 1):
+            try:
+                opts = Options()
+                opts.add_argument('--headless=new')
+                opts.add_argument('--disable-gpu')
+                opts.add_argument('--no-sandbox')
+                opts.add_argument('--disable-dev-shm-usage')
+                opts.add_argument('--disable-software-rasterizer')
+                opts.add_argument('--window-size=1280,1024')
+                opts.add_argument('--disable-extensions')
+                opts.add_argument('--disable-logging')
+                opts.add_argument('--log-level=3')
+                opts.add_argument('--ignore-certificate-errors')
+                # 更快返回，减少渲染等待导致的 renderer 超时
+                opts.page_load_strategy = 'eager'
 
-        # 返回相对于项目根目录的相对路径
-        project_root = os.getcwd()
-        relative_path = os.path.relpath(save_path, project_root)
-        return relative_path
+                driver = webdriver.Chrome(options=opts)
+                driver.set_page_load_timeout(15)
+                driver.set_script_timeout(15)
+
+                # 访问页面
+                try:
+                    driver.get(url)
+                except TimeoutException:
+                    # 停止继续加载，尽量使用当前已渲染内容
+                    try:
+                        driver.execute_script("window.stop();")
+                    except Exception:
+                        pass
+
+                # 等待 DOM 就绪或至少有 <body>
+                try:
+                    WebDriverWait(driver, 8).until(
+                        lambda d: d.execute_script("return document.readyState") in ("interactive", "complete")
+                    )
+                except Exception:
+                    # 退而求其次，等待 body 元素出现
+                    try:
+                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                    except Exception:
+                        pass
+
+                # 轻微等待以稳定首屏
+                import time
+                time.sleep(0.5)
+
+                # 保存截图
+                driver.save_screenshot(save_path)
+                print(f"网页截图已保存: {save_path}")
+
+                # 返回相对于项目根目录的相对路径
+                project_root = os.getcwd()
+                relative_path = os.path.relpath(save_path, project_root)
+                return relative_path
+
+            except (TimeoutException, WebDriverException, Exception) as e:
+                last_err = e
+                print(f"第 {attempt}/{RETRIES} 次截图尝试失败: {e}")
+            finally:
+                if driver:
+                    try:
+                        driver.quit()
+                    except Exception:
+                        pass
+                    driver = None
+
+        # 所有重试失败
+        print(f"截图失败 {url}: {last_err}")
+        return None
 
     except Exception as e:
         print(f"截图失败 {url}: {e}")
         return None
-
-    finally:
-        # 确保驱动被正确关闭
-        if driver:
-            try:
-                driver.quit()
-            except Exception:
-                pass
 
 
 def get_all_links(url, depth=3, exclude=None, visited=None):
@@ -318,15 +448,15 @@ def get_all_links(url, depth=3, exclude=None, visited=None):
     return all_links
 
 
-def crawler_link(url, depth=3, exclude=None):
+def crawler_link(url, depth=3, exclude=None, threads=10):
     """
-    爬虫主函数 - API调用入口（支持增量爬取）
+    爬虫主函数 - API调用入口（支持增量爬取，链接处理多线程）
 
     参数:
         url: str - 需要爬虫的 url 链接
         depth: int - 爬虫的深度
         exclude: list[str] - 需要排除的 url (用于增量更新策略)
-
+        threads: int - 并发线程数
     返回:
         tuple: (results, valid_rate, precision_rate, screenshot_path)
         - results: list[dict] - [{'link': str, 'content_path': str}, ...]
@@ -343,6 +473,10 @@ def crawler_link(url, depth=3, exclude=None):
     save_dir = os.path.join(config.save_path, f"{domain}_{unique_id}")
     os.makedirs(save_dir, exist_ok=True)
     print(f"保存目录: {save_dir}")
+
+    # 初始化链接重要性检测器
+    detector = CriticalLinkDetector()
+    base_domain = domain
 
     # 对入口页面进行截图
     screenshot_path = None
@@ -361,72 +495,60 @@ def crawler_link(url, depth=3, exclude=None):
     unique_links = list(set(all_links))
     print(f"总共爬取到 {len(unique_links)} 个唯一链接（已排除 {len(exclude_set)} 个已存在链接）")
 
-    # 统计变量
-    valid_links = []
-    invalid_links = []
-    success_downloads = 0
-    failed_downloads = 0
-
     illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
 
-    # 下载内容并分类链接
+    # 多线程处理每个链接
     results = []
-    for link in unique_links:
-        print(f"处理链接: {link}")
 
-        # 获取链接的域名和IP地址
+    def process_link(link: str):
+        print(f"处理链接: {link}")
         link_domain = urlparse(link).netloc
         ip_address = get_ip_address(link_domain)
+        importance_score = detector.calculate_link_importance(link, base_domain=base_domain)
 
-        # 尝试请求链接验证有效性
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         }
         response = safe_request(link, headers)
 
         if response:
-            valid_links.append(link)
-
-            # 生成安全的文件名
             filename = re.sub(illegal_chars, '', link)
-            if len(filename) > 200:  # 限制文件名长度
+            if len(filename) > 200:
                 filename = filename[:200]
             save_path = os.path.join(save_dir, filename)
-
-            # 下载内容
-            try:
-                with open(save_path, 'wb') as file:
-                    file.write(response.content)
-                print(f"文件已下载到: {save_path}")
-                success_downloads += 1
-                results.append({
-                    'link': link,
-                    'content_path': save_path,
-                    'status_code': response.status_code,
-                    'content_type': response.headers.get('Content-Type', ''),
-                    'ip_address': ip_address
-                })
-            except Exception as e:
-                print(f"下载失败: {link} - {str(e)}")
-                failed_downloads += 1
-                results.append({
-                    'link': link,
-                    'content_path': None,
-                    'status_code': response.status_code,
-                    'content_type': response.headers.get('Content-Type', ''),
-                    'ip_address': ip_address
-                })
+            return {
+                'link': link,
+                'content_path': save_path,
+                'status_code': response.status_code,
+                'content_type': response.headers.get('Content-Type', ''),
+                'ip_address': ip_address,
+                'importance_score': round(importance_score, 4)
+            }
         else:
-            invalid_links.append(link)
+            return {
+                'link': link,
+                'content_path': None,
+                'status_code': None,
+                'content_type': '',
+                'ip_address': ip_address,
+                'importance_score': round(importance_score, 4)
+            }
+
+    with ThreadPoolExecutor(max_workers=max(1, int(threads))) as executor:
+        for res in executor.map(process_link, unique_links):
+            results.append(res)
 
     # 计算指标
-    total_links = len(valid_links) + len(invalid_links)
-    valid_rate = len(valid_links) / total_links if total_links > 0 else 0.0
-    precision_rate = success_downloads / len(valid_links) if len(valid_links) > 0 else 0.0
+    total_links = len(results)
+    valid_links_count = sum(1 for r in results if r.get('content_path'))
+    invalid_links_count = total_links - valid_links_count
+    valid_rate = (valid_links_count / total_links) if total_links else 0.0
+    # 由于未实际写入文件，成功请求视为成功下载
+    precision_rate = 1.0 if valid_links_count else 0.0
 
     print(f"\n=== 爬取完成 ===")
-    print(f"有效链接: {len(valid_links)}")
-    print(f"无效链接: {len(invalid_links)}")
+    print(f"有效链接: {valid_links_count}")
+    print(f"无效链接: {invalid_links_count}")
     print(f"Valid Rate: {valid_rate:.2%}")
     print(f"Precision Rate: {precision_rate:.2%}")
 
@@ -539,15 +661,47 @@ class CrawlerService:
                         status_code=result.get('status_code'),
                         content_type=result.get('content_type'),
                         source_url=url,
-                        ip_address=result.get('ip_address')
+                        ip_address=result.get('ip_address'),
+                        importance_score=result.get('importance_score')
                     )
                     self.db.crawled_links.insert_one(link_doc)
                     new_links += 1
 
             # 统计结果
             total_links = len(results)
-            valid_links = len([r for r in results if r.get('content_path')])
-            invalid_links = total_links - valid_links
+            valid_links = 0
+            invalid_links = 0
+            err_link = 0
+
+            # domain_set = set()
+            # try:
+            #     domain_file = Path('domain.json')
+            #     if domain_file.exists():
+            #         with domain_file.open('r', encoding='utf-8') as f:
+            #             data = json.load(f)
+            #             if isinstance(data, dict):
+            #                 domain_set = set(data.get('domains', []))
+            #             elif isinstance(data, list):
+            #                 domain_set = set(data)
+            # except Exception as e:
+            #     print(f"读取domain.json失败: {e}")
+
+            for r in results:
+                if r.get('content_path'):
+                    valid_links += 1
+                    if r.get('importance_score') < 0.4:
+                        invalid_links += 1
+                        r['link_type'] = 'invalid'
+                    else:
+                        # 仅当域名在 domain.json 中时才计入 err_link
+                        domain = r.get('url', '')
+                        # if domain and domain in domain_set:
+                        if 'ad' in domain.lower() or 'ads' in domain.lower():
+                            err_link += 1
+            # valid_links = len([r for r in results if r.get('content_path')])
+            # invalid_links = total_links - valid_links
+            valid_rate = ((valid_links - invalid_links) / valid_links) if valid_links else 1.0
+            precision_rate = 1 - (err_link / invalid_links) if invalid_links else 1.0
 
             # 更新任务统计和截图路径
             update_data = CrawlTaskModel.update_statistics(

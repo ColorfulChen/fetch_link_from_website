@@ -29,14 +29,12 @@ export function formatTime(
           year: "numeric",
           month: "2-digit",
           day: "2-digit",
-          timeZone: "UTC"
         });
       case "time":
         return utc8Date.toLocaleTimeString("zh-CN", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
-          timeZone: "UTC",
           hour12: false
         });
       case "datetime":
@@ -48,7 +46,6 @@ export function formatTime(
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
-          timeZone: "UTC",
           hour12: false
         });
     }

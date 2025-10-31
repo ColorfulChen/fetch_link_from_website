@@ -71,7 +71,7 @@ def get_websites():
         # 获取查询参数
         status = request.args.get('status', None)
         page = int(request.args.get('page', 1))
-        page_size = int(request.args.get('page_size', 20))
+        page_size = int(request.args.get('page_size', 2000))
 
         # 构建查询条件
         query = {}
