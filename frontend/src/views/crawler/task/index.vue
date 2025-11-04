@@ -266,9 +266,9 @@ onMounted(() => {
     <el-card>
       <el-table v-loading="loading" :data="tableData" stripe>
         <el-table-column
-          prop="id"
-          label="任务ID"
-          width="220"
+          prop="website.name"
+          label="网站"
+          width="150"
           show-overflow-tooltip
         />
         <el-table-column prop="task_type" label="类型" width="80">
