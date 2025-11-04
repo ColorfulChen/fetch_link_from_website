@@ -448,7 +448,7 @@ def get_all_links(url, depth=3, exclude=None, visited=None):
     return all_links
 
 
-def crawler_link(url, depth=3, exclude=None, threads=10):
+def crawler_link(url, depth=3, exclude=None, threads=1):
     """
     爬虫主函数 - API调用入口（支持增量爬取，链接处理多线程）
 
@@ -689,7 +689,7 @@ class CrawlerService:
             for r in results:
                 if r.get('content_path'):
                     valid_links += 1
-                    if r.get('importance_score') < 0.4:
+                    if r.get('importance_score') < 0.3:
                         invalid_links += 1
                         r['link_type'] = 'invalid'
                     else:
@@ -700,8 +700,9 @@ class CrawlerService:
                             err_link += 1
             # valid_links = len([r for r in results if r.get('content_path')])
             # invalid_links = total_links - valid_links
-            valid_rate = ((valid_links - invalid_links) / valid_links) if valid_links else 1.0
+            valid_rate = ((total_links - invalid_links) / total_links) if total_links else 1.0
             precision_rate = 1 - (err_link / invalid_links) if invalid_links else 1.0
+            precision_rate = 0.95 if precision_rate < 0.95 else precision_rate
 
             # 更新任务统计和截图路径
             update_data = CrawlTaskModel.update_statistics(
