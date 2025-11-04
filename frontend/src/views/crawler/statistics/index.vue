@@ -278,7 +278,7 @@ onMounted(() => {
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
-                有效链接占总链接的比例
+                重要链接占总连接的比例
               </el-text>
             </el-card>
           </el-col>
@@ -296,7 +296,7 @@ onMounted(() => {
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
-                成功下载占有效链接的比例
+                有效链接识别准确率
               </el-text>
             </el-card>
           </el-col>
