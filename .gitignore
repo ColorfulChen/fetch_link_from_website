@@ -11,6 +11,7 @@ exports/
 # Distribution / packaging
 .Python
 build/
+!frontend/build
 develop-eggs/
 dist/
 downloads/

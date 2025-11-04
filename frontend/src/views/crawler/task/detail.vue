@@ -151,6 +151,12 @@ onMounted(() => {
         <el-descriptions-item label="网站ID">{{
           taskDetail.website_id
         }}</el-descriptions-item>
+        <el-descriptions-item label="网站名称">{{
+          taskDetail.website.name
+        }}</el-descriptions-item>
+        <el-descriptions-item label="网站地址">{{
+          taskDetail.website.url
+        }}</el-descriptions-item>
         <el-descriptions-item label="任务类型">
           {{ taskDetail.task_type === "manual" ? "手动" : "定时" }}
         </el-descriptions-item>

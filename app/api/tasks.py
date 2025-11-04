@@ -118,6 +118,15 @@ def get_tasks():
         # 转换为字典
         tasks_list = [CrawlTaskModel.to_dict(t) for t in tasks]
 
+        # 为每个任务添加网站信息
+        from ..models import WebsiteModel
+        for task in tasks_list:
+            website = db.websites.find_one({'_id': ObjectId(task['website_id'])})
+            if website:
+                task['website'] = WebsiteModel.to_dict(website)
+            else:
+                task['website'] = None
+
         return paginate_response(tasks_list, total, page, page_size)
 
     except Exception as e:
@@ -134,7 +143,17 @@ def get_task(task_id):
         if not task:
             return error_response('任务不存在', 404)
 
-        return success_response(CrawlTaskModel.to_dict(task))
+        task_dict = CrawlTaskModel.to_dict(task)
+        
+        # 添加网站信息
+        from ..models import WebsiteModel
+        website = db.websites.find_one({'_id': ObjectId(task['website_id'])})
+        if website:
+            task_dict['website'] = WebsiteModel.to_dict(website)
+        else:
+            task_dict['website'] = None
+
+        return success_response(task_dict)
 
     except InvalidId:
         return error_response('任务ID格式无效', 400)
