@@ -94,7 +94,7 @@ onMounted(() => {
     <el-card class="mb-4">
       <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
-          欢迎使用 FETCHLINK
+          欢迎使用 链接重要性评估系统
         </h1>
         <p class="text-gray-500">网页链接爬虫系统</p>
       </div>
@@ -138,7 +138,8 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <span class="text-base font-semibold">所有网站统计概览</span>
           <el-text type="info" size="small">
-            统计周期: {{ statistics.period.from || '全部' }} ~ {{ statistics.period.to || '全部' }}
+            统计周期: {{ statistics.period.from || "全部" }} ~
+            {{ statistics.period.to || "全部" }}
           </el-text>
         </div>
       </template>
@@ -265,7 +266,7 @@ onMounted(() => {
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
-                有效链接识别准确率
+                重要链接识别准确率
               </el-text>
             </el-card>
           </el-col>
