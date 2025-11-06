@@ -296,7 +296,7 @@ onMounted(() => {
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
-                有效链接识别准确率
+                重要链接识别准确率
               </el-text>
             </el-card>
           </el-col>

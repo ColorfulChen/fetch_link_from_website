@@ -200,14 +200,14 @@ onMounted(() => {
         </el-col>
         <el-col :span="6">
           <el-statistic
-            title="有效链接数"
+            title="重要链接数"
             :value="taskDetail.statistics.valid_links"
             value-style="color: #67C23A"
           />
         </el-col>
         <el-col :span="6">
           <el-statistic
-            title="无效链接数"
+            title="非重要链接数"
             :value="taskDetail.statistics.invalid_links"
             value-style="color: #F56C6C"
           />

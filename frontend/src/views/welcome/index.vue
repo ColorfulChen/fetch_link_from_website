@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { ElMessage } from "element-plus";
-import { getStatistics, type StatisticsSummary } from "@/api/statistics";
-import { getWebsites, type Website } from "@/api/websites";
+import { getAllStatistics, type StatisticsSummary } from "@/api/statistics";
 
 defineOptions({
   name: "Welcome"
 });
 
-// 网站列表
-const websiteList = ref<Website[]>([]);
-
 // 查询表单
 const queryForm = reactive({
-  website_id: "",
   date_from: "",
   date_to: ""
 });
@@ -21,7 +16,6 @@ const queryForm = reactive({
 // 统计数据
 const loading = ref(false);
 const statistics = ref<{
-  website: { id: string; name: string };
   period: { from: string; to: string };
   summary: StatisticsSummary;
 } | null>(null);
@@ -57,33 +51,11 @@ const shortcuts = [
   }
 ];
 
-// 加载网站列表
-const loadWebsites = async () => {
-  try {
-    const res = await getWebsites({ status: "active" });
-    if (res.success) {
-      websiteList.value = res.data;
-      // 默认选择第一个网站
-      if (res.data.length > 0) {
-        queryForm.website_id = res.data[0].id;
-        loadStatistics();
-      }
-    }
-  } catch (error) {
-    console.error("加载网站列表失败", error);
-  }
-};
-
 // 加载统计数据
 const loadStatistics = async () => {
-  if (!queryForm.website_id) {
-    ElMessage.warning("请选择网站");
-    return;
-  }
-
   loading.value = true;
   try {
-    const res = await getStatistics(queryForm);
+    const res = await getAllStatistics(queryForm);
     if (res.success) {
       statistics.value = res.data;
     }
@@ -112,7 +84,7 @@ const formatPercent = (value: number) => {
 };
 
 onMounted(() => {
-  loadWebsites();
+  loadStatistics();
 });
 </script>
 
@@ -122,7 +94,7 @@ onMounted(() => {
     <el-card class="mb-4">
       <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
-          欢迎使用 FETCHLINK
+          欢迎使用 链接重要性评估系统
         </h1>
         <p class="text-gray-500">网页链接爬虫系统</p>
       </div>
@@ -131,21 +103,6 @@ onMounted(() => {
     <!-- 查询表单 -->
     <el-card class="mb-4">
       <div class="flex flex-wrap items-center gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-sm whitespace-nowrap">网站</span>
-          <el-select
-            v-model="queryForm.website_id"
-            placeholder="请选择网站"
-            style="width: 200px"
-          >
-            <el-option
-              v-for="website in websiteList"
-              :key="website.id"
-              :label="website.name"
-              :value="website.id"
-            />
-          </el-select>
-        </div>
         <div class="flex items-center gap-2">
           <span class="text-sm whitespace-nowrap">日期范围</span>
           <el-date-picker
@@ -179,11 +136,10 @@ onMounted(() => {
     <el-card v-if="statistics" v-loading="loading">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="text-base font-semibold"
-            >统计概览 - {{ statistics.website.name }}</span
-          >
+          <span class="text-base font-semibold">所有网站统计概览</span>
           <el-text type="info" size="small">
-            统计周期: {{ statistics.period.from }} ~ {{ statistics.period.to }}
+            统计周期: {{ statistics.period.from || "全部" }} ~
+            {{ statistics.period.to || "全部" }}
           </el-text>
         </div>
       </template>
@@ -310,7 +266,7 @@ onMounted(() => {
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
-                有效链接识别准确率
+                重要链接识别准确率
               </el-text>
             </el-card>
           </el-col>
@@ -319,7 +275,7 @@ onMounted(() => {
     </el-card>
 
     <!-- 空状态 -->
-    <el-empty v-else-if="!loading" description="请选择网站查看统计数据" />
+    <el-empty v-else-if="!loading" description="暂无统计数据" />
   </div>
 </template>
 

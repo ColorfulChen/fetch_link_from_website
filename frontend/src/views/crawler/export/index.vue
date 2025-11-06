@@ -259,8 +259,8 @@ onMounted(() => {
             clearable
             style="width: 100%"
           >
-            <el-option label="有效链接" value="valid" />
-            <el-option label="无效链接" value="invalid" />
+            <el-option label="重要链接" value="valid" />
+            <el-option label="非重要链接" value="invalid" />
           </el-select>
         </el-form-item>
 
@@ -348,8 +348,8 @@ onMounted(() => {
             clearable
             style="width: 100%"
           >
-            <el-option label="有效链接" value="valid" />
-            <el-option label="无效链接" value="invalid" />
+            <el-option label="重要链接" value="valid" />
+            <el-option label="非重要链接" value="invalid" />
           </el-select>
         </el-form-item>
 
