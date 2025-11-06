@@ -94,7 +94,7 @@ onMounted(() => {
     <el-card class="mb-4">
       <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
-          欢迎使用 FETCHLINK
+          欢迎使用 连接重要性评估系统
         </h1>
         <p class="text-gray-500">网页链接爬虫系统</p>
       </div>
