@@ -38,3 +38,26 @@ export type GetStatisticsParams = {
 export const getStatistics = (params: GetStatisticsParams) => {
   return http.request<StatisticsResult>("get", "/statistics", { params });
 };
+
+/** 获取所有网站统计数据查询参数 */
+export type GetAllStatisticsParams = {
+  date_from?: string;
+  date_to?: string;
+};
+
+/** 所有网站统计数据响应 */
+export type AllStatisticsResult = {
+  success: boolean;
+  data: {
+    period: {
+      from: string;
+      to: string;
+    };
+    summary: StatisticsSummary;
+  };
+};
+
+/** 获取所有网站的统计数据 */
+export const getAllStatistics = (params?: GetAllStatisticsParams) => {
+  return http.request<AllStatisticsResult>("get", "/statistics/all", { params });
+};
