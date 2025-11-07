@@ -83,6 +83,11 @@ const formatPercent = (value: number) => {
   return `${(value * 100).toFixed(2)}%`;
 };
 
+// 格式化进度条百分比显示
+const formatProgressPercent = (percentage: number) => {
+  return `${percentage.toFixed(2)}%`;
+};
+
 onMounted(() => {
   loadStatistics();
 });
@@ -244,6 +249,7 @@ onMounted(() => {
               <el-progress
                 :percentage="statistics.summary.avg_valid_rate * 100"
                 :stroke-width="20"
+                :format="formatProgressPercent"
                 class="mt-4"
               />
               <el-text type="info" size="small" class="mt-2">
@@ -262,6 +268,7 @@ onMounted(() => {
               <el-progress
                 :percentage="statistics.summary.avg_precision_rate * 100"
                 :stroke-width="20"
+                :format="formatProgressPercent"
                 color="#409EFF"
                 class="mt-4"
               />
