@@ -1,0 +1,1 @@
+import{aC as t}from"./index-B-MJRUf7.js";const r=s=>t.request("post","/tasks/crawl",{data:s}),n=s=>t.request("get","/tasks",{params:s}),c=s=>t.request("get",`/tasks/${s}`),o=(s,e)=>t.request("get",`/tasks/${s}/logs`,{params:e}),k=s=>t.request("post",`/tasks/${s}/cancel`),u=s=>t.request("delete",`/tasks/${s}`);export{k as a,c as b,r as c,u as d,o as e,n as g};
