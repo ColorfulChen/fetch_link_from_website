@@ -144,7 +144,13 @@ class CriticalLinkDetector:
         score += self._analyze_text_content(url_lower) * 0.6
         score += self._analyze_position(url_lower) * 0.2
         score += self._analyze_visual_features(url_lower) * 0.2
-        if original_domain in link_url:
+
+        domain = re.sub(r'^https?://', '', original_domain)
+        domain = re.sub(r'/.*$', '', domain)
+        pattern = r'(?:www\.)?([a-zA-Z0-9-]+)\.(?:com|cn|net|org|edu|gov|co\.[a-z]+|[a-z]{2,})'
+        match = re.search(pattern, domain)
+        
+        if match.group(1) in link_url:
             score += 0.4  # 同源域名加分
         else:
             score -= 0.3  # 非同源域名扣分
@@ -553,7 +559,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
     for r in results:
         if r.get('importance_score'):
             valid_links_count += 1
-            if r.get('importance_score') < 0.6:
+            if r.get('importance_score') < 0.8:
                 invalid_links_count += 1
                 r['link_type'] = 'invalid'
             else:
@@ -564,8 +570,8 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
                     err_link += 1
     # valid_links = len([r for r in results if r.get('content_path')])
     # invalid_links = total_links - valid_links
-    valid_rate = ((valid_links_count - invalid_links_count) / valid_links_count) if valid_links_count else 1.0
-    precision_rate = 1 - (err_link / invalid_links_count) if invalid_links_count else 1.0
+    valid_rate = round(((valid_links_count - invalid_links_count) / valid_links_count), 4) if valid_links_count else 1.0
+    precision_rate = round(1 - (err_link / invalid_links_count), 4) if invalid_links_count else 1.0
 
     print(f"\n=== 爬取完成 ===")
     print(f"有效链接: {valid_links_count}")
@@ -703,7 +709,7 @@ class CrawlerService:
 
             # 更新任务统计和截图路径
             update_data = CrawlTaskModel.update_statistics(
-                total_links=total_links,
+                total_links=total_links+invalid_links,
                 valid_links=valid_links,
                 invalid_links=invalid_links,
                 new_links=new_links,
