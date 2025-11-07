@@ -9,6 +9,7 @@ from datetime import datetime
 from . import statistics_bp
 from ..database import get_db
 from ..utils import success_response, error_response
+from ..utils.validators import parse_iso_datetime
 
 
 @statistics_bp.route('', methods=['GET'])
@@ -33,9 +34,14 @@ def get_statistics():
         # 构建查询条件
         query = {'website_id': website_obj_id}
         if date_from and date_to:
+            try:
+                dt_from = parse_iso_datetime(date_from)
+                dt_to = parse_iso_datetime(date_to)
+            except ValueError:
+                return error_response('日期范围格式无效，应为 ISO-8601 字符串', 400)
             query['started_at'] = {
-                '$gte': datetime.fromisoformat(date_from),
-                '$lte': datetime.fromisoformat(date_to)
+                '$gte': dt_from,
+                '$lte': dt_to
             }
 
         # 统计任务数据
@@ -98,9 +104,14 @@ def get_all_statistics():
         # 构建查询条件
         query = {}
         if date_from and date_to:
+            try:
+                dt_from = parse_iso_datetime(date_from)
+                dt_to = parse_iso_datetime(date_to)
+            except ValueError:
+                return error_response('日期范围格式无效，应为 ISO-8601 字符串', 400)
             query['started_at'] = {
-                '$gte': datetime.fromisoformat(date_from),
-                '$lte': datetime.fromisoformat(date_to)
+                '$gte': dt_from,
+                '$lte': dt_to
             }
 
         # 统计所有任务数据
