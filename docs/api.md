@@ -1110,7 +1110,7 @@ GET /api/statistics?website_id=xxx&date_from=2025-10-01&date_to=2025-10-22
 - **failed_tasks**: 失败任务数
 - **total_links_crawled**: 爬取的总链接数
 - **new_links_found**: 新增链接数（增量任务）
-- **avg_valid_rate**: 平均有效率（有效链接 / 总链接）
+- **avg_valid_rate**: 重要链接占比（有效链接 / 总链接）
 - **avg_precision_rate**: 平均精准率（成功下载 / 有效链接）
 
 **错误码**
