@@ -12,6 +12,7 @@ from datetime import datetime
 from . import export_bp
 from ..database import get_db
 from ..utils import success_response, error_response
+from ..utils.validators import parse_iso_datetime
 
 
 @export_bp.route('', methods=['POST'])
@@ -40,7 +41,10 @@ def export_data():
 
         # 增量导出
         if data['export_type'] == 'incremental' and data.get('since_date'):
-            since_date = datetime.fromisoformat(data['since_date'])
+            try:
+                since_date = parse_iso_datetime(data['since_date'])
+            except ValueError:
+                return error_response('since_date 格式无效，应为 ISO-8601 日期时间字符串', 400)
             query['first_crawled_at'] = {'$gt': since_date}
 
         # 过滤条件
@@ -138,7 +142,10 @@ def batch_export_data():
 
         # 增量导出
         if export_type == 'incremental' and data.get('since_date'):
-            since_date = datetime.fromisoformat(data['since_date'])
+            try:
+                since_date = parse_iso_datetime(data['since_date'])
+            except ValueError:
+                return error_response('since_date 格式无效，应为 ISO-8601 日期时间字符串', 400)
             query['first_crawled_at'] = {'$gt': since_date}
 
         # 过滤条件
