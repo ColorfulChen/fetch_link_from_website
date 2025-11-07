@@ -564,8 +564,8 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
                     err_link += 1
     # valid_links = len([r for r in results if r.get('content_path')])
     # invalid_links = total_links - valid_links
-    valid_rate = ((valid_links_count - invalid_links_count) / valid_links_count) if valid_links_count else 1.0
-    precision_rate = 1 - (err_link / invalid_links_count) if invalid_links_count else 1.0
+    valid_rate = round(((valid_links_count - invalid_links_count) / valid_links_count), 4) if valid_links_count else 1.0
+    precision_rate = round(1 - (err_link / invalid_links_count), 4) if invalid_links_count else 1.0
 
     print(f"\n=== 爬取完成 ===")
     print(f"有效链接: {valid_links_count}")
