@@ -68,7 +68,7 @@ class CrawlTaskModel:
 
     @staticmethod
     def update_statistics(total_links: int, valid_links: int,
-                         invalid_links: int, new_links: int = 0) -> Dict[str, Any]:
+                         invalid_links: int, new_links: int = 0, valid_rate: float = 0.0, precision_rate: float = 0.0) -> Dict[str, Any]:
         """
         更新任务统计信息
 
@@ -81,8 +81,8 @@ class CrawlTaskModel:
         Returns:
             MongoDB 更新操作符字典
         """
-        valid_rate = valid_links / total_links if total_links > 0 else 0
-        precision_rate = valid_links / (valid_links + invalid_links) if (valid_links + invalid_links) > 0 else 0
+        # valid_rate = valid_links / total_links if total_links > 0 else 0
+        # precision_rate = valid_links / (valid_links + invalid_links) if (valid_links + invalid_links) > 0 else 0
 
         return {
             '$set': {

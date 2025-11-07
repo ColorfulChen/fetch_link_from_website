@@ -20,6 +20,7 @@ from app.config import config
 import app.global_vars as app_global
 from app.database import get_db
 from app.models import CrawledLinkModel, CrawlTaskModel, CrawlLogModel
+from pymongo.errors import DuplicateKeyError  # 新增：捕获唯一索引冲突
 
 
 def safe_soup(content, content_type=None):
@@ -136,13 +137,18 @@ class CriticalLinkDetector:
         self.importance_threshold = 0.6
         self.target_filter_rate = 0.3
 
-    def calculate_link_importance(self, link_url, base_domain=None):
+    def calculate_link_importance(self, link_url, base_domain=None, original_domain=None):
         """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
         url_lower = (link_url or '').lower()
         score = 0.0
         score += self._analyze_text_content(url_lower) * 0.6
         score += self._analyze_position(url_lower) * 0.2
         score += self._analyze_visual_features(url_lower) * 0.2
+        if original_domain in link_url:
+            score += 0.4  # 同源域名加分
+        else:
+            score -= 0.3  # 非同源域名扣分
+
         return min(max(score, 0.0), 1.0)
 
     def _analyze_text_content(self, url_text):
@@ -448,7 +454,7 @@ def get_all_links(url, depth=3, exclude=None, visited=None):
     return all_links
 
 
-def crawler_link(url, depth=3, exclude=None, threads=1):
+def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
     """
     爬虫主函数 - API调用入口（支持增量爬取，链接处理多线程）
 
@@ -504,7 +510,7 @@ def crawler_link(url, depth=3, exclude=None, threads=1):
         print(f"处理链接: {link}")
         link_domain = urlparse(link).netloc
         ip_address = get_ip_address(link_domain)
-        importance_score = detector.calculate_link_importance(link, base_domain=base_domain)
+        importance_score = detector.calculate_link_importance(link, base_domain=base_domain, original_domain=original_domain)
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -540,11 +546,26 @@ def crawler_link(url, depth=3, exclude=None, threads=1):
 
     # 计算指标
     total_links = len(results)
-    valid_links_count = sum(1 for r in results if r.get('content_path'))
-    invalid_links_count = total_links - valid_links_count
-    valid_rate = (valid_links_count / total_links) if total_links else 0.0
-    # 由于未实际写入文件，成功请求视为成功下载
-    precision_rate = 1.0 if valid_links_count else 0.0
+    valid_links_count = 0
+    invalid_links_count = 0
+    err_link = 0
+
+    for r in results:
+        if r.get('importance_score'):
+            valid_links_count += 1
+            if r.get('importance_score') < 0.6:
+                invalid_links_count += 1
+                r['link_type'] = 'invalid'
+            else:
+                # 仅当域名在 domain.json 中时才计入 err_link
+                domain = r.get('url', '')
+                # if domain and domain in domain_set:
+                if 'ad' in domain.lower() or 'ads' in domain.lower():
+                    err_link += 1
+    # valid_links = len([r for r in results if r.get('content_path')])
+    # invalid_links = total_links - valid_links
+    valid_rate = ((valid_links_count - invalid_links_count) / valid_links_count) if valid_links_count else 1.0
+    precision_rate = 1 - (err_link / invalid_links_count) if invalid_links_count else 1.0
 
     print(f"\n=== 爬取完成 ===")
     print(f"有效链接: {valid_links_count}")
@@ -552,7 +573,7 @@ def crawler_link(url, depth=3, exclude=None, threads=1):
     print(f"Valid Rate: {valid_rate:.2%}")
     print(f"Precision Rate: {precision_rate:.2%}")
 
-    return results, valid_rate, precision_rate, screenshot_path
+    return results, valid_rate, precision_rate, screenshot_path, valid_links_count, invalid_links_count
 
 
 class CrawlerService:
@@ -593,6 +614,8 @@ class CrawlerService:
 
             # 获取网站信息
             website = self.db.websites.find_one({'_id': website_id})
+            original_domain = website['domain']
+
             if not website:
                 raise Exception(f"网站不存在: {website_id}")
 
@@ -613,7 +636,8 @@ class CrawlerService:
                 self._log(task_id, 'INFO', '全量模式：爬取所有链接')
 
             # 执行爬取
-            results, valid_rate, precision_rate, screenshot_path = crawler_link(url, depth, exclude_urls)
+            results, valid_rate, precision_rate, screenshot_path,valid_links,invalid_links = crawler_link(url, depth, exclude_urls, original_domain)
+            total_links = len(results)
 
             # 检查是否需要停止（任务可能已被强制取消）
             if app_global.should_stop(task_id):
@@ -638,78 +662,53 @@ class CrawlerService:
 
                 link_url = result['link']
 
-                # 检查链接是否已存在
+                # 准备待插入文档
+                link_doc = CrawledLinkModel.create(
+                    website_id=website_id,
+                    task_id=task_id,
+                    url=link_url,
+                    domain=urlparse(link_url).netloc,
+                    link_type='valid' if result.get('content_path') else 'invalid',
+                    status_code=result.get('status_code'),
+                    content_type=result.get('content_type'),
+                    source_url=url,
+                    ip_address=result.get('ip_address'),
+                    importance_score=result.get('importance_score')
+                )
+
+                # 若存在相同链接：删除旧数据后插入新数据
                 existing_link = self.db.crawled_links.find_one({
                     'website_id': website_id,
                     'url': link_url
                 })
-
                 if existing_link:
-                    # 更新已存在的链接
-                    self.db.crawled_links.update_one(
-                        {'_id': existing_link['_id']},
-                        CrawledLinkModel.update_crawl_info()
-                    )
+                    self.db.crawled_links.delete_one({'_id': existing_link['_id']})
+                    try:
+                        self.db.crawled_links.insert_one(link_doc)
+                    except DuplicateKeyError:
+                        # 并发竞争导致再次重复：强制清理后重插一次
+                        self.db.crawled_links.delete_many({'website_id': website_id, 'url': link_url})
+                        self.db.crawled_links.insert_one(link_doc)
+                    # 覆盖不计入 new_links
                 else:
-                    # 插入新链接
-                    link_doc = CrawledLinkModel.create(
-                        website_id=website_id,
-                        task_id=task_id,
-                        url=link_url,
-                        domain=urlparse(link_url).netloc,
-                        link_type='valid' if result.get('content_path') else 'invalid',
-                        status_code=result.get('status_code'),
-                        content_type=result.get('content_type'),
-                        source_url=url,
-                        ip_address=result.get('ip_address'),
-                        importance_score=result.get('importance_score')
-                    )
-                    self.db.crawled_links.insert_one(link_doc)
-                    new_links += 1
+                    # 不存在则直接插入；若并发下重复，则按规则删除后重插
+                    try:
+                        self.db.crawled_links.insert_one(link_doc)
+                        new_links += 1
+                    except DuplicateKeyError:
+                        self.db.crawled_links.delete_many({'website_id': website_id, 'url': link_url})
+                        self.db.crawled_links.insert_one(link_doc)
+                        # 并发覆盖不计入 new_links
 
-            # 统计结果
-            total_links = len(results)
-            valid_links = 0
-            invalid_links = 0
-            err_link = 0
-
-            # domain_set = set()
-            # try:
-            #     domain_file = Path('domain.json')
-            #     if domain_file.exists():
-            #         with domain_file.open('r', encoding='utf-8') as f:
-            #             data = json.load(f)
-            #             if isinstance(data, dict):
-            #                 domain_set = set(data.get('domains', []))
-            #             elif isinstance(data, list):
-            #                 domain_set = set(data)
-            # except Exception as e:
-            #     print(f"读取domain.json失败: {e}")
-
-            for r in results:
-                if r.get('content_path'):
-                    valid_links += 1
-                    if r.get('importance_score') < 0.3:
-                        invalid_links += 1
-                        r['link_type'] = 'invalid'
-                    else:
-                        # 仅当域名在 domain.json 中时才计入 err_link
-                        domain = r.get('url', '')
-                        # if domain and domain in domain_set:
-                        if 'ad' in domain.lower() or 'ads' in domain.lower():
-                            err_link += 1
-            # valid_links = len([r for r in results if r.get('content_path')])
-            # invalid_links = total_links - valid_links
-            valid_rate = ((total_links - invalid_links) / total_links) if total_links else 1.0
-            precision_rate = 1 - (err_link / invalid_links) if invalid_links else 1.0
-            precision_rate = 0.95 if precision_rate < 0.95 else precision_rate
 
             # 更新任务统计和截图路径
             update_data = CrawlTaskModel.update_statistics(
                 total_links=total_links,
                 valid_links=valid_links,
                 invalid_links=invalid_links,
-                new_links=new_links
+                new_links=new_links,
+                valid_rate = valid_rate,
+                precision_rate = precision_rate,
             )
             # 添加截图路径
             if screenshot_path:
