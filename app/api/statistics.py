@@ -48,7 +48,7 @@ def get_statistics():
         total_links_crawled = sum(t['statistics']['total_links'] for t in tasks)
         new_links_found = sum(t['statistics']['new_links'] for t in tasks)
 
-        # 计算平均有效率和精准率
+        # 计算重要链接占比和精准率
         avg_valid_rate = 0
         avg_precision_rate = 0
         if completed_tasks > 0:
@@ -113,7 +113,7 @@ def get_all_statistics():
         total_links_crawled = sum(t['statistics']['total_links'] for t in tasks)
         new_links_found = sum(t['statistics']['new_links'] for t in tasks)
 
-        # 计算平均有效率和精准率
+        # 计算重要链接占比和精准率
         avg_valid_rate = 0
         avg_precision_rate = 0
         if completed_tasks > 0:

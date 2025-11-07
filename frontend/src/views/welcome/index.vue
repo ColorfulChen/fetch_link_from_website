@@ -236,7 +236,7 @@ onMounted(() => {
           <el-col :span="12">
             <el-card shadow="never" class="text-center">
               <div class="mb-4">
-                <div class="text-gray-500 text-sm mb-2">平均有效率</div>
+                <div class="text-gray-500 text-sm mb-2">重要链接占比</div>
                 <div class="text-4xl font-semibold" style="color: #67c23a">
                   {{ formatPercent(statistics.summary.avg_valid_rate) }}
                 </div>
