@@ -137,7 +137,7 @@ class CriticalLinkDetector:
         self.importance_threshold = 0.6
         self.target_filter_rate = 0.3
 
-    def calculate_link_importance(self, link_url, base_domain=None, original_domain=None):
+    def calculate_link_importance(self, link_url, base_domain=None, original_domain=None, content_type=None):
         """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
         url_lower = (link_url or '').lower()
         score = 0.0
@@ -149,11 +149,15 @@ class CriticalLinkDetector:
         domain = re.sub(r'/.*$', '', domain)
         pattern = r'(?:www\.)?([a-zA-Z0-9-]+)\.(?:com|cn|net|org|edu|gov|co\.[a-z]+|[a-z]{2,})'
         match = re.search(pattern, domain)
+        domain_patter = "."+match.group(1)+"."
         
-        if match.group(1) in link_url:
+        if domain_patter in link_url:
             score += 0.4  # 同源域名加分
         else:
             score -= 0.3  # 非同源域名扣分
+
+        if "text" not in content_type:
+            score -= 0.3
 
         return min(max(score, 0.0), 1.0)
 
@@ -231,111 +235,73 @@ def get_ip_address(domain):
         print(f"获取IP地址异常 {domain}: {e}")
         return None
 
-
 def screenshot_page(url, save_dir):
     """
-    对指定 URL 截图并保存到指定目录
-
-    参数:
-        url: str - 需要截图的 URL
-        save_dir: str - 截图保存目录
-
-    返回:
-        save_path: str - 截图文件相对路径（相对于项目根目录），失败返回 None
+    对指定 URL 截图并保存到指定目录 - 使用 pyppeteer 作为备选方案
     """
-    driver = None
     try:
-        # 为每次截图创建独立的驱动实例
-        from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
-        from selenium.common.exceptions import TimeoutException, WebDriverException
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-
-        # 重试以缓解 renderer 超时
-        RETRIES = 2
-        last_err = None
-
+        import asyncio
+        import os
+        import re
+        from pyppeteer import launch
+        
         # 生成安全的文件名
         illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
-        fname = "screenshot-" + re.sub(illegal_chars, '', url) + ".png"
+        fname = "screenshot-" + re.sub(illegal_chars, '', url)[:100] + ".png"
         save_path = os.path.join(save_dir, fname)
-
-        for attempt in range(1, RETRIES + 1):
+        
+        async def take_screenshot():
+            browser = None
             try:
-                opts = Options()
-                opts.add_argument('--headless=new')
-                opts.add_argument('--disable-gpu')
-                opts.add_argument('--no-sandbox')
-                opts.add_argument('--disable-dev-shm-usage')
-                opts.add_argument('--disable-software-rasterizer')
-                opts.add_argument('--window-size=1280,1024')
-                opts.add_argument('--disable-extensions')
-                opts.add_argument('--disable-logging')
-                opts.add_argument('--log-level=3')
-                opts.add_argument('--ignore-certificate-errors')
-                # 更快返回，减少渲染等待导致的 renderer 超时
-                opts.page_load_strategy = 'eager'
-
-                driver = webdriver.Chrome(options=opts)
-                driver.set_page_load_timeout(15)
-                driver.set_script_timeout(15)
-
+                # 启动浏览器
+                browser = await launch(
+                    headless=True,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--window-size=1920,1080'
+                    ],
+                    handleSIGINT=False,
+                    handleSIGTERM=False,
+                    handleSIGHUP=False
+                )
+                
+                page = await browser.newPage()
+                await page.setViewport({'width': 1920, 'height': 1080})
+                
                 # 访问页面
-                try:
-                    driver.get(url)
-                except TimeoutException:
-                    # 停止继续加载，尽量使用当前已渲染内容
-                    try:
-                        driver.execute_script("window.stop();")
-                    except Exception:
-                        pass
-
-                # 等待 DOM 就绪或至少有 <body>
-                try:
-                    WebDriverWait(driver, 8).until(
-                        lambda d: d.execute_script("return document.readyState") in ("interactive", "complete")
-                    )
-                except Exception:
-                    # 退而求其次，等待 body 元素出现
-                    try:
-                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-                    except Exception:
-                        pass
-
-                # 轻微等待以稳定首屏
-                import time
-                time.sleep(0.5)
-
-                # 保存截图
-                driver.save_screenshot(save_path)
-                print(f"网页截图已保存: {save_path}")
-
-                # 返回相对于项目根目录的相对路径
-                project_root = os.getcwd()
-                relative_path = os.path.relpath(save_path, project_root)
-                return relative_path
-
-            except (TimeoutException, WebDriverException, Exception) as e:
-                last_err = e
-                print(f"第 {attempt}/{RETRIES} 次截图尝试失败: {e}")
+                await page.goto(url, {'waitUntil': 'networkidle2', 'timeout': 30000})
+                
+                # 截图
+                await page.screenshot({'path': save_path, 'fullPage': False})
+                
+                return save_path
+                
+            except Exception as e:
+                print(f"pyppeteer 截图失败: {e}")
+                return None
             finally:
-                if driver:
-                    try:
-                        driver.quit()
-                    except Exception:
-                        pass
-                    driver = None
-
-        # 所有重试失败
-        print(f"截图失败 {url}: {last_err}")
-        return None
-
+                if browser:
+                    await browser.close()
+        
+        # 运行异步任务
+        import nest_asyncio
+        nest_asyncio.apply()
+        
+        result = asyncio.get_event_loop().run_until_complete(take_screenshot())
+        
+        if result:
+            project_root = os.getcwd()
+            relative_path = os.path.relpath(save_path, project_root)
+            print(f"网页截图已保存: {save_path}")
+            return relative_path
+        else:
+            return None
+            
     except Exception as e:
-        print(f"截图失败 {url}: {e}")
+        print(f"pyppeteer 方案失败: {e}")
         return None
-
 
 def get_all_links(url, depth=3, exclude=None, visited=None):
     """
@@ -516,7 +482,6 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
         print(f"处理链接: {link}")
         link_domain = urlparse(link).netloc
         ip_address = get_ip_address(link_domain)
-        importance_score = detector.calculate_link_importance(link, base_domain=base_domain, original_domain=original_domain)
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -528,6 +493,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
             if len(filename) > 200:
                 filename = filename[:200]
             save_path = os.path.join(save_dir, filename)
+            importance_score = detector.calculate_link_importance(link, base_domain=base_domain, original_domain=original_domain,content_type = response.headers.get('Content-Type', ''))
             return {
                 'link': link,
                 'content_path': save_path,
@@ -543,7 +509,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
                 'status_code': None,
                 'content_type': '',
                 'ip_address': ip_address,
-                'importance_score': round(importance_score, 4)
+                'importance_score': 0.0
             }
 
     with ThreadPoolExecutor(max_workers=max(1, int(threads))) as executor:
@@ -559,18 +525,19 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
     for r in results:
         if r.get('importance_score'):
             valid_links_count += 1
-            if r.get('importance_score') < 0.8:
+            if r.get('importance_score') < 0.9:
                 invalid_links_count += 1
                 r['link_type'] = 'invalid'
             else:
                 # 仅当域名在 domain.json 中时才计入 err_link
                 domain = r.get('url', '')
+                r['link_type'] = 'valid'
                 # if domain and domain in domain_set:
                 if 'ad' in domain.lower() or 'ads' in domain.lower():
                     err_link += 1
     # valid_links = len([r for r in results if r.get('content_path')])
     # invalid_links = total_links - valid_links
-    valid_rate = round(((valid_links_count - invalid_links_count) / valid_links_count), 4) if valid_links_count else 1.0
+    valid_rate = round((valid_links_count / (valid_links_count + invalid_links_count) ), 4) if valid_links_count else 1.0
     precision_rate = round(1 - (err_link / invalid_links_count), 4) if invalid_links_count else 1.0
 
     print(f"\n=== 爬取完成 ===")
