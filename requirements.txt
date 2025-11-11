@@ -14,7 +14,9 @@ requests==2.31.0
 beautifulsoup4==4.12.2
 lxml==4.9.3
 chardet==5.2.0
-selenium==4.15.0
+
+nest_asyncio
+pyppeteer
 
 # 数据处理
 pandas==2.1.3
