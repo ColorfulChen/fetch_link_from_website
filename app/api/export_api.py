@@ -71,7 +71,7 @@ def export_data():
             with open(filepath, 'w', newline='', encoding='utf-8') as f:
                 if links:
                     writer = csv.DictWriter(
-                        f, fieldnames=['url', 'domain', 'ip_address', 'link_type', 'status_code', 'last_crawled_at'])
+                        f, fieldnames=['url', 'domain', 'ip_address', 'link_type', 'importance_score', 'content_type', 'status_code', 'last_crawled_at', 'website_id'])
                     writer.writeheader()
                     for link in links:
                         writer.writerow({
@@ -79,8 +79,11 @@ def export_data():
                             'domain': link['domain'],
                             'ip_address': link.get('ip_address', ''),
                             'link_type': link['link_type'],
+                            'importance_score': link.get('importance_score','0.0'),
+                            'content_type': link.get('content_type',''),
                             'status_code': link.get('status_code', ''),
-                            'last_crawled_at': link['last_crawled_at'].isoformat() if link.get('last_crawled_at') else ''
+                            'last_crawled_at': link['last_crawled_at'].isoformat() if link.get('last_crawled_at') else '',
+                            'website_id': str(link['website_id'])
                         })
         else:  # json
             # 转换 ObjectId 和 datetime
@@ -172,7 +175,7 @@ def batch_export_data():
             with open(filepath, 'w', newline='', encoding='utf-8') as f:
                 if links:
                     writer = csv.DictWriter(
-                        f, fieldnames=['url', 'domain', 'ip_address', 'link_type', 'status_code', 'last_crawled_at', 'website_id'])
+                        f, fieldnames=['url', 'domain', 'ip_address', 'link_type', 'importance_score', 'content_type', 'status_code', 'last_crawled_at', 'website_id'])
                     writer.writeheader()
                     for link in links:
                         writer.writerow({
@@ -180,6 +183,8 @@ def batch_export_data():
                             'domain': link['domain'],
                             'ip_address': link.get('ip_address', ''),
                             'link_type': link['link_type'],
+                            'importance_score': link.get('importance_score','0.0'),
+                            'content_type': link.get('content_type',''),
                             'status_code': link.get('status_code', ''),
                             'last_crawled_at': link['last_crawled_at'].isoformat() if link.get('last_crawled_at') else '',
                             'website_id': str(link['website_id'])
