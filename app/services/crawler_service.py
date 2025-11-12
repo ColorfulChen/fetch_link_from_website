@@ -137,7 +137,7 @@ class CriticalLinkDetector:
         self.importance_threshold = 0.6
         self.target_filter_rate = 0.3
 
-    def calculate_link_importance(self, link_url, base_domain=None, original_domain=None, content_type=None):
+    def calculate_link_importance(self, link_url, original_domain=None, content_type=None):
         """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
         url_lower = (link_url or '').lower()
         score = 0.0
@@ -149,9 +149,9 @@ class CriticalLinkDetector:
         domain = re.sub(r'/.*$', '', domain)
         pattern = r'(?:www\.)?([a-zA-Z0-9-]+)\.(?:com|cn|net|org|edu|gov|co\.[a-z]+|[a-z]{2,})'
         match = re.search(pattern, domain)
-        domain_patter = "."+match.group(1)+"."
+        domain_patter = match.group(1)+"."
         
-        if domain_patter in link_url:
+        if domain_patter in url_lower:
             score += 0.4  # 同源域名加分
         else:
             score -= 0.3  # 非同源域名扣分
@@ -454,7 +454,6 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
 
     # 初始化链接重要性检测器
     detector = CriticalLinkDetector()
-    base_domain = domain
 
     # 对入口页面进行截图
     screenshot_path = None
@@ -493,14 +492,26 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
             if len(filename) > 200:
                 filename = filename[:200]
             save_path = os.path.join(save_dir, filename)
-            importance_score = detector.calculate_link_importance(link, base_domain=base_domain, original_domain=original_domain,content_type = response.headers.get('Content-Type', ''))
+            content_type = response.headers.get('Content-Type', '')
+            importance_score = detector.calculate_link_importance(link, original_domain=original_domain,content_type = content_type)
+            
+            if "text" in content_type:
+                # 确保响应对象有 text 属性且不为 None
+                if hasattr(response, 'text') and response.text is not None:
+                    response_text = response.text
+                else:
+                    response_text = ''
+            else:
+                response_text = ''
+
             return {
                 'link': link,
                 'content_path': save_path,
                 'status_code': response.status_code,
-                'content_type': response.headers.get('Content-Type', ''),
+                'content_type': content_type,
                 'ip_address': ip_address,
-                'importance_score': round(importance_score, 4)
+                'importance_score': round(importance_score, 4),
+                'text': response_text
             }
         else:
             return {
@@ -509,7 +520,8 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
                 'status_code': None,
                 'content_type': '',
                 'ip_address': ip_address,
-                'importance_score': 0.0
+                'importance_score': 0.0,
+                'text':''
             }
 
     with ThreadPoolExecutor(max_workers=max(1, int(threads))) as executor:
@@ -525,7 +537,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
     for r in results:
         if r.get('importance_score'):
             valid_links_count += 1
-            if r.get('importance_score') < 0.9:
+            if r.get('importance_score') < 1.0:
                 invalid_links_count += 1
                 r['link_type'] = 'invalid'
             else:
@@ -646,7 +658,8 @@ class CrawlerService:
                     content_type=result.get('content_type'),
                     source_url=url,
                     ip_address=result.get('ip_address'),
-                    importance_score=result.get('importance_score')
+                    importance_score=result.get('importance_score'),
+                    text=result.get('text')
                 )
 
                 # 若存在相同链接：删除旧数据后插入新数据
