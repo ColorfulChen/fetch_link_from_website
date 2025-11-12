@@ -492,14 +492,26 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
             if len(filename) > 200:
                 filename = filename[:200]
             save_path = os.path.join(save_dir, filename)
-            importance_score = detector.calculate_link_importance(link, original_domain=original_domain,content_type = response.headers.get('Content-Type', ''))
+            content_type = response.headers.get('Content-Type', '')
+            importance_score = detector.calculate_link_importance(link, original_domain=original_domain,content_type = content_type)
+            
+            if "text" in content_type:
+                # 确保响应对象有 text 属性且不为 None
+                if hasattr(response, 'text') and response.text is not None:
+                    response_text = response.text
+                else:
+                    response_text = ''
+            else:
+                response_text = ''
+
             return {
                 'link': link,
                 'content_path': save_path,
                 'status_code': response.status_code,
-                'content_type': response.headers.get('Content-Type', ''),
+                'content_type': content_type,
                 'ip_address': ip_address,
-                'importance_score': round(importance_score, 4)
+                'importance_score': round(importance_score, 4),
+                'text': response_text
             }
         else:
             return {
@@ -508,7 +520,8 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
                 'status_code': None,
                 'content_type': '',
                 'ip_address': ip_address,
-                'importance_score': 0.0
+                'importance_score': 0.0,
+                'text':''
             }
 
     with ThreadPoolExecutor(max_workers=max(1, int(threads))) as executor:
@@ -645,7 +658,8 @@ class CrawlerService:
                     content_type=result.get('content_type'),
                     source_url=url,
                     ip_address=result.get('ip_address'),
-                    importance_score=result.get('importance_score')
+                    importance_score=result.get('importance_score'),
+                    text=result.get('text')
                 )
 
                 # 若存在相同链接：删除旧数据后插入新数据
