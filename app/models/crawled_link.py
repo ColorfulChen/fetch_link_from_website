@@ -15,7 +15,8 @@ class CrawledLinkModel:
     def create(website_id: ObjectId, task_id: ObjectId, url: str,
                domain: str, link_type: str, status_code: Optional[int] = None,
                content_type: Optional[str] = None, source_url: Optional[str] = None,
-               ip_address: Optional[str] = None, importance_score: Optional[float] = None) -> Dict[str, Any]:
+               ip_address: Optional[str] = None, importance_score: Optional[float] = None,
+               text: Optional[str]=None) -> Dict[str, Any]:
         """
         创建爬取链接文档
 
@@ -30,6 +31,7 @@ class CrawledLinkModel:
             source_url: 来源URL
             ip_address: IP地址
             importance_score: 重要性评分
+            text: response.text
 
         Returns:
             链接文档字典
@@ -44,6 +46,7 @@ class CrawledLinkModel:
             'content_type': content_type,
             'ip_address': ip_address,
             'importance_score': importance_score,
+            'text': text,
             'first_crawled_at': datetime.utcnow(),
             'last_crawled_at': datetime.utcnow(),
             'crawl_count': 1,
