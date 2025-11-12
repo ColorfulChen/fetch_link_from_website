@@ -137,7 +137,7 @@ class CriticalLinkDetector:
         self.importance_threshold = 0.6
         self.target_filter_rate = 0.3
 
-    def calculate_link_importance(self, link_url, base_domain=None, original_domain=None, content_type=None):
+    def calculate_link_importance(self, link_url, original_domain=None, content_type=None):
         """计算链接重要性得分（0-1） - 基于URL启发式，兼容无DOM环境"""
         url_lower = (link_url or '').lower()
         score = 0.0
@@ -149,9 +149,9 @@ class CriticalLinkDetector:
         domain = re.sub(r'/.*$', '', domain)
         pattern = r'(?:www\.)?([a-zA-Z0-9-]+)\.(?:com|cn|net|org|edu|gov|co\.[a-z]+|[a-z]{2,})'
         match = re.search(pattern, domain)
-        domain_patter = "."+match.group(1)+"."
+        domain_patter = match.group(1)+"."
         
-        if domain_patter in link_url:
+        if domain_patter in url_lower:
             score += 0.4  # 同源域名加分
         else:
             score -= 0.3  # 非同源域名扣分
@@ -454,7 +454,6 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
 
     # 初始化链接重要性检测器
     detector = CriticalLinkDetector()
-    base_domain = domain
 
     # 对入口页面进行截图
     screenshot_path = None
@@ -493,7 +492,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
             if len(filename) > 200:
                 filename = filename[:200]
             save_path = os.path.join(save_dir, filename)
-            importance_score = detector.calculate_link_importance(link, base_domain=base_domain, original_domain=original_domain,content_type = response.headers.get('Content-Type', ''))
+            importance_score = detector.calculate_link_importance(link, original_domain=original_domain,content_type = response.headers.get('Content-Type', ''))
             return {
                 'link': link,
                 'content_path': save_path,
@@ -525,7 +524,7 @@ def crawler_link(url, depth=3, exclude=None, original_domain=None, threads=10):
     for r in results:
         if r.get('importance_score'):
             valid_links_count += 1
-            if r.get('importance_score') < 0.9:
+            if r.get('importance_score') < 1.0:
                 invalid_links_count += 1
                 r['link_type'] = 'invalid'
             else:
