@@ -237,6 +237,92 @@ def get_ip_address(domain):
 
 def screenshot_page(url, save_dir):
     """
+    对指定 URL 截图并保存到指定目录 - 使用 playwright 作为截图方案
+    """
+    try:
+        import asyncio
+        import os
+        import re
+        from playwright.async_api import async_playwright
+
+        # 生成安全的文件名
+        illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
+        fname = "screenshot-" + re.sub(illegal_chars, '', url)[:100] + ".png"
+        save_path = os.path.join(save_dir, fname)
+
+        async def take_screenshot():
+            async with async_playwright() as p:
+                browser = None
+                try:
+                    # 启动浏览器
+                    print("Attempting to launch playwright browser (chromium)...")
+                    browser = await p.chromium.launch(
+                        headless=True,
+                        args=[
+                            '--no-sandbox',
+                            '--disable-dev-shm-usage',
+                            '--disable-gpu'
+                        ]
+                    )
+                    print("Browser launched successfully.")
+
+                    context = await browser.new_context(
+                        viewport={'width': 1920, 'height': 1080},
+                        java_script_enabled=True
+                    )
+                    page = await context.new_page()
+                    print("New page created.")
+
+                    # 访问页面
+                    print(f"Navigating to {url}...")
+                    await page.goto(url, wait_until='networkidle', timeout=30000)
+                    print("Page navigation successful.")
+
+                    # 截图
+                    print(f"Taking screenshot and saving to {save_path}...")
+                    await page.screenshot(path=save_path, full_page=False)
+                    print("Screenshot taken successfully.")
+
+                    return save_path
+
+                except Exception as e:
+                    print(f"playwright 截图失败: {e}")
+                    return None
+                finally:
+                    if browser:
+                        print("Closing browser...")
+                        await browser.close()
+                        print("Browser closed.")
+
+        # 运行异步任务
+        try:
+            # 尝试获取当前正在运行的事件循环
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # 如果没有正在运行的事件循环，则创建一个新的
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        result = loop.run_until_complete(take_screenshot())
+
+        if result:
+            project_root = os.getcwd()
+            relative_path = os.path.relpath(save_path, project_root)
+            print(f"网页截图已保存: {save_path}")
+            return relative_path
+        else:
+            return None
+
+    except ImportError:
+        print("Playwright 未安装. 请运行 'pip install playwright' 和 'playwright install'.")
+        return None
+    except Exception as e:
+        print(f"playwright 方案失败: {e}")
+        return None
+
+
+def screenshot_page_pyppeteer(url, save_dir):
+    """
     对指定 URL 截图并保存到指定目录 - 使用 pyppeteer 作为备选方案
     """
     try:
@@ -302,7 +388,8 @@ def screenshot_page(url, save_dir):
     except Exception as e:
         print(f"pyppeteer 方案失败: {e}")
         return None
-        
+
+
 def get_all_links(url, depth=3, exclude=None, visited=None):
     """
     递归爬取链接（支持增量爬取）
