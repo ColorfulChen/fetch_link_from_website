@@ -319,7 +319,77 @@ def screenshot_page(url, save_dir):
     except Exception as e:
         print(f"playwright 方案失败: {e}")
         return None
+
+
+def screenshot_page_pyppeteer(url, save_dir):
+    """
+    对指定 URL 截图并保存到指定目录 - 使用 pyppeteer 作为备选方案
+    """
+    try:
+        import asyncio
+        import os
+        import re
+        from pyppeteer import launch
         
+        # 生成安全的文件名
+        illegal_chars = r'[<>:"/\\|?*\x00-\x1F]'
+        fname = "screenshot-" + re.sub(illegal_chars, '', url)[:100] + ".png"
+        save_path = os.path.join(save_dir, fname)
+        
+        async def take_screenshot():
+            browser = None
+            try:
+                # 启动浏览器
+                browser = await launch(
+                    headless=True,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--window-size=1920,1080'
+                    ],
+                    handleSIGINT=False,
+                    handleSIGTERM=False,
+                    handleSIGHUP=False
+                )
+                
+                page = await browser.newPage()
+                await page.setViewport({'width': 1920, 'height': 1080})
+                
+                # 访问页面
+                await page.goto(url, {'waitUntil': 'networkidle2', 'timeout': 30000})
+                
+                # 截图
+                await page.screenshot({'path': save_path, 'fullPage': False})
+                
+                return save_path
+                
+            except Exception as e:
+                print(f"pyppeteer 截图失败: {e}")
+                return None
+            finally:
+                if browser:
+                    await browser.close()
+        
+        # 运行异步任务
+        import nest_asyncio
+        nest_asyncio.apply()
+        
+        result = asyncio.get_event_loop().run_until_complete(take_screenshot())
+        
+        if result:
+            project_root = os.getcwd()
+            relative_path = os.path.relpath(save_path, project_root)
+            print(f"网页截图已保存: {save_path}")
+            return relative_path
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"pyppeteer 方案失败: {e}")
+        return None
+
+
 def get_all_links(url, depth=3, exclude=None, visited=None):
     """
     递归爬取链接（支持增量爬取）
